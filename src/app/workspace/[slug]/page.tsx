@@ -43,7 +43,7 @@ export default async function WorkspacePage({ params }: { params: Promise<{ slug
   const isOwner = membership.role === 'owner'
 
   return (
-    <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
+    <main className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
       {/* Breadcrumb */}
       <nav className="flex items-center gap-1.5 text-sm text-slate-400 mb-6" aria-label="Breadcrumb">
         <Link href="/dashboard" className="hover:text-slate-600 transition-colors">Dashboard</Link>
@@ -74,7 +74,7 @@ export default async function WorkspacePage({ params }: { params: Promise<{ slug
           <p className="text-slate-400 text-sm">Aún no has creado ningún tablero en este workspace.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 animate-fade-in">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5 animate-fade-in">
           {boards.map(board => (
             <BoardCard key={board.id} board={board} slug={slug} isOwner={isOwner} />
           ))}

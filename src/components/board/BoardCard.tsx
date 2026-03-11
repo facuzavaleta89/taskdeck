@@ -46,7 +46,7 @@ export default function BoardCard({ board, slug, isOwner }: Props) {
       <div className="relative rounded-xl shadow-sm group">
         <Link
           href={`/workspace/${slug}/board/${board.id}`}
-          className="block p-5 text-white font-semibold text-base hover:brightness-90 transition-all rounded-xl min-h-[80px] flex items-end"
+          className="block p-5 text-white font-semibold text-base hover:brightness-90 transition-all rounded-xl min-h-[140px] flex items-start break-words overflow-hidden"
           style={{ backgroundColor: color }}
         >
           {name}
@@ -124,9 +124,11 @@ export default function BoardCard({ board, slug, isOwner }: Props) {
             <input
               type="text"
               value={name}
-              onChange={e => setName(e.target.value)}
+              onChange={e => setName(e.target.value.slice(0, 20))}
               onKeyDown={e => { if (e.key === 'Enter') handleSave(); if (e.key === 'Escape') setEditOpen(false) }}
               autoFocus
+              maxLength={20}
+              placeholder="Máx. 20 caracteres"
               className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-800 text-sm mb-4"
             />
 

@@ -161,7 +161,7 @@ export default function BoardView({ board, initialColumns, initialCards, initial
   }
 
   return (
-    <div className="flex flex-col flex-1 overflow-hidden">
+    <div className="flex flex-col flex-1 overflow-hidden max-w-screen-2xl mx-auto w-full">
       {/* Toolbar */}
       <div className="px-4 sm:px-6 py-2 bg-black/10 flex items-center gap-2 flex-shrink-0">
         <LabelsManager

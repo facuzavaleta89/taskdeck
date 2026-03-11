@@ -22,7 +22,7 @@ export default async function DashboardPage() {
   })) ?? []
 
   return (
-    <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
+    <main className="w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
       {/* Header */}
       <div className="flex items-center justify-between mb-8 gap-4">
         <div>
@@ -45,7 +45,7 @@ export default async function DashboardPage() {
           <CreateWorkspaceButton />
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 animate-fade-in">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5 animate-fade-in">
           {workspaces.map(ws => (
             <WorkspaceCard key={ws.id} workspace={ws} currentUserId={user.id} />
           ))}

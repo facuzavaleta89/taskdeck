@@ -93,11 +93,12 @@ export default function CreateBoardButton({ workspaceId }: { workspaceId: string
 
             <input
               type="text"
-              placeholder="Nombre del tablero"
+              placeholder="Nombre del tablero (máx. 20 caracteres)"
               value={name}
-              onChange={e => setName(e.target.value)}
+              onChange={e => setName(e.target.value.slice(0, 20))}
               onKeyDown={e => e.key === 'Enter' && handleCreate()}
               autoFocus
+              maxLength={20}
               className="w-full px-4 py-2.5 bg-white text-slate-800 placeholder-slate-400 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm mb-2"
             />
 
