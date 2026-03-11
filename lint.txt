@@ -1,0 +1,45 @@
+
+> taskdeck@0.1.0 lint
+> eslint
+
+
+/home/facuzavaleta89/dev/taskdeck/src/app/(dashboard)/dashboard/page.tsx
+  20:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/facuzavaleta89/dev/taskdeck/src/app/(dashboard)/layout.tsx
+  3:8  warning  'Link' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/facuzavaleta89/dev/taskdeck/src/app/invite/[token]/page.tsx
+  21:47  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/facuzavaleta89/dev/taskdeck/src/components/board/BoardCard.tsx
+  21:50  warning  'currentUserId' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/facuzavaleta89/dev/taskdeck/src/components/board/BoardView.tsx
+  31:89  warning  'currentUserId' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/facuzavaleta89/dev/taskdeck/src/components/board/Card.tsx
+   6:39  warning  'ChecklistItem' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           @typescript-eslint/no-unused-vars
+  53:21  error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/home/facuzavaleta89/dev/taskdeck/src/components/board/Card.tsx:53:21
+  51 |   }
+  52 |
+> 53 |   useEffect(() => { loadSummary() }, [card.id])
+     |                     ^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  54 |
+  55 |   const cardLabels: CardLabel[] = card.labels ?? []
+  56 |   const isOverdue  = card.due_date && !card.completed && new Date(card.due_date) < new Date()  react-hooks/set-state-in-effect
+  53:38  warning  React Hook useEffect has a missing dependency: 'loadSummary'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      react-hooks/exhaustive-deps
+
+/home/facuzavaleta89/dev/taskdeck/src/components/board/CardModal.tsx
+  31:6  warning  React Hook useEffect has a missing dependency: 'supabase'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+✖ 9 problems (3 errors, 6 warnings)
+

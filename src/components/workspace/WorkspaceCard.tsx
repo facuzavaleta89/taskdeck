@@ -1,0 +1,157 @@
+'use client'
+
+import { useState } from 'react'
+import Link from 'next/link'
+import { createClient } from '@/lib/supabase/client'
+import { useRouter } from 'next/navigation'
+import { Modal, ConfirmModal } from '@/components/ui/Modal'
+
+interface Props {
+  workspace: {
+    id: string
+    name: string
+    slug: string
+    owner_id: string
+    role: string
+  }
+  currentUserId: string
+}
+
+const ROLE_LABELS: Record<string, { label: string; color: string }> = {
+  owner: { label: 'Propietario', color: 'bg-violet-100 text-violet-700' },
+  admin: { label: 'Admin',       color: 'bg-blue-100 text-blue-700' },
+  member:{ label: 'Miembro',     color: 'bg-slate-100 text-slate-600' },
+}
+
+const BG_COLORS = ['bg-blue-500', 'bg-violet-500', 'bg-emerald-500', 'bg-orange-500', 'bg-rose-500', 'bg-cyan-500']
+
+export default function WorkspaceCard({ workspace, currentUserId }: Props) {
+  const [menuOpen,     setMenuOpen]     = useState(false)
+  const [editOpen,     setEditOpen]     = useState(false)
+  const [confirmDelete,setConfirmDelete]= useState(false)
+  const [name, setName]     = useState(workspace.name)
+  const [loading, setLoading] = useState(false)
+  const isOwner = workspace.owner_id === currentUserId
+  const router  = useRouter()
+  const supabase = createClient()
+
+  async function handleRename() {
+    if (!name.trim()) return
+    setLoading(true)
+    await supabase.from('workspaces').update({ name: name.trim() }).eq('id', workspace.id)
+    setEditOpen(false)
+    setLoading(false)
+    router.refresh()
+  }
+
+  async function handleDelete() {
+    await supabase.from('workspaces').delete().eq('id', workspace.id)
+    router.refresh()
+  }
+
+  const letter   = workspace.name[0]?.toUpperCase() ?? '?'
+  const bgColor  = BG_COLORS[workspace.name.charCodeAt(0) % BG_COLORS.length]
+  const roleInfo = ROLE_LABELS[workspace.role] ?? { label: workspace.role, color: 'bg-slate-100 text-slate-600' }
+
+  return (
+    <>
+      <div className="bg-white rounded-2xl border border-slate-200 hover:border-slate-300 hover:shadow-lg transition-all duration-200 group">
+        <Link href={`/workspace/${workspace.slug}`} className="block p-5">
+          <div className="flex items-start gap-4">
+            {/* Avatar */}
+            <div className={`w-11 h-11 ${bgColor} rounded-xl flex items-center justify-center text-white font-bold text-lg flex-shrink-0`}>
+              {letter}
+            </div>
+
+            <div className="flex-1 min-w-0">
+              <h3 className="font-semibold text-slate-800 text-sm truncate">{workspace.name}</h3>
+              <p className="text-slate-400 text-xs mt-0.5 font-mono">/{workspace.slug}</p>
+              <span className={`inline-block mt-2 text-xs font-medium px-2 py-0.5 rounded-full ${roleInfo.color}`}>
+                {roleInfo.label}
+              </span>
+            </div>
+          </div>
+        </Link>
+
+        {isOwner && (
+          <div className="px-5 pb-4 flex justify-end border-t border-slate-100 pt-3 relative">
+            <button
+              onClick={e => { e.preventDefault(); setMenuOpen(v => !v) }}
+              className="text-slate-300 hover:text-slate-600 transition-colors p-1.5 rounded-lg hover:bg-slate-100 relative z-10"
+              title="Opciones"
+            >
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                <circle cx="5" cy="12" r="2" /><circle cx="12" cy="12" r="2" /><circle cx="19" cy="12" r="2" />
+              </svg>
+            </button>
+
+            {/* Dropdown */}
+            {menuOpen && (
+              <>
+                <div className="fixed inset-0 z-40" onClick={(e) => { e.preventDefault(); setMenuOpen(false); }} />
+                <div className="absolute bg-white border border-slate-200 rounded-xl shadow-xl z-50 w-44 py-1.5 animate-scale-in origin-top-right right-5 top-12">
+                  <button
+                    onClick={(e) => { e.preventDefault(); setEditOpen(true); setMenuOpen(false); }}
+                    className="w-full text-left px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                  >
+                    Renombrar
+                  </button>
+                  <div className="mx-3 my-1 h-px bg-slate-100" />
+                  <button
+                    onClick={(e) => { e.preventDefault(); setConfirmDelete(true); setMenuOpen(false); }}
+                    className="w-full text-left px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 transition-colors"
+                  >
+                    Eliminar
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        )}
+      </div>
+
+
+
+      {/* Edit modal */}
+      {editOpen && (
+        <Modal onClose={() => setEditOpen(false)} size="sm">
+          <div className="p-6">
+            <h3 className="text-base font-semibold text-slate-800 mb-4">Renombrar workspace</h3>
+            <input
+              type="text"
+              value={name}
+              onChange={e => setName(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter') handleRename(); if (e.key === 'Escape') setEditOpen(false) }}
+              autoFocus
+              className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-800 text-sm mb-4"
+            />
+            <div className="flex gap-3 justify-end">
+              <button onClick={() => setEditOpen(false)} className="px-4 py-2 text-sm text-slate-500 hover:text-slate-700 transition-colors">
+                Cancelar
+              </button>
+              <button
+                onClick={handleRename}
+                disabled={loading || !name.trim()}
+                className="bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
+              >
+                {loading ? 'Guardando...' : 'Guardar'}
+              </button>
+            </div>
+          </div>
+        </Modal>
+      )}
+
+      {/* Confirm delete */}
+      {confirmDelete && (
+        <ConfirmModal
+          title="¿Eliminar workspace?"
+          message={`Se eliminará "${workspace.name}" junto con todos sus tableros y datos.`}
+          confirmLabel="Eliminar"
+          danger
+          onConfirm={() => { setConfirmDelete(false); handleDelete() }}
+          onCancel={() => setConfirmDelete(false)}
+        />
+      )}
+    </>
+  )
+}
