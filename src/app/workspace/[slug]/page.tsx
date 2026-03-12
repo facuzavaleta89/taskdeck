@@ -1,9 +1,9 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect, notFound } from 'next/navigation'
-import Link from 'next/link'
 import CreateBoardButton from '@/components/board/CreateBoardButton'
 import InviteMemberButton from '@/components/workspace/InviteMemberButton'
 import BoardCard from '@/components/board/BoardCard'
+import { WorkspaceNameSetter } from '@/components/workspace/WorkspaceNameSetter'
 import type { Metadata } from 'next'
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
@@ -44,18 +44,10 @@ export default async function WorkspacePage({ params }: { params: Promise<{ slug
 
   return (
     <main className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
-      {/* Breadcrumb */}
-      <nav className="flex items-center gap-1.5 text-sm text-slate-400 mb-6" aria-label="Breadcrumb">
-        <Link href="/dashboard" className="hover:text-slate-600 transition-colors">Dashboard</Link>
-        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-        </svg>
-        <span className="text-slate-600 font-medium truncate">{workspace.name}</span>
-      </nav>
-
+      <WorkspaceNameSetter workspaceName={workspace.name} />
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-        <h2 className="text-2xl sm:text-3xl font-bold text-slate-800 truncate">{workspace.name}</h2>
+        <h2 className="text-2xl sm:text-3xl font-bold text-[var(--color-text-primary)] truncate">{workspace.name}</h2>
         <div className="flex gap-2 sm:gap-3 flex-shrink-0">
           {isOwner && <InviteMemberButton workspaceId={workspace.id} />}
           <CreateBoardButton workspaceId={workspace.id} />
@@ -65,13 +57,13 @@ export default async function WorkspacePage({ params }: { params: Promise<{ slug
       {/* Boards */}
       {!boards || boards.length === 0 ? (
         <div className="text-center py-24 sm:py-32 animate-fade-in">
-          <div className="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+          <div className="w-16 h-16 bg-[var(--color-bg-secondary)] rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-[var(--color-text-muted)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
             </svg>
           </div>
-          <p className="text-slate-600 font-semibold mb-1">Sin tableros todavía</p>
-          <p className="text-slate-400 text-sm">Aún no has creado ningún tablero en este workspace.</p>
+          <p className="text-[var(--color-text-primary)] font-semibold mb-1">Sin tableros todavía</p>
+          <p className="text-[var(--color-text-secondary)] text-sm">Aún no has creado ningún tablero en este workspace.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5 animate-fade-in">

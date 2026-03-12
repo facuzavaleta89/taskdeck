@@ -53,7 +53,7 @@ export default function CreateBoardButton({ workspaceId }: { workspaceId: string
     <>
       <button
         onClick={() => setOpen(true)}
-        className="bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-blue-700 transition-all hover:shadow-md flex items-center gap-1.5"
+        className="bg-[var(--color-brand)] text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-[var(--color-brand-hover)] transition-all hover:shadow-md flex items-center gap-1.5"
       >
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
@@ -65,7 +65,7 @@ export default function CreateBoardButton({ workspaceId }: { workspaceId: string
       {open && (
         <Modal onClose={handleClose} size="sm">
           <div className="p-6">
-            <h3 className="text-base font-semibold text-slate-800 mb-4">Crear tablero</h3>
+            <h3 className="text-base font-semibold text-[var(--color-text-primary)] mb-4">Crear tablero</h3>
 
             {/* Preview */}
             <div
@@ -84,7 +84,7 @@ export default function CreateBoardButton({ workspaceId }: { workspaceId: string
                   className="w-8 h-8 rounded-lg transition-all hover:scale-110"
                   style={{
                     backgroundColor: c,
-                    outline: color === c ? '2px solid #1d4ed8' : 'none',
+                    outline: color === c ? '2px solid var(--color-brand)' : 'none',
                     outlineOffset: '2px',
                   }}
                 />
@@ -99,7 +99,7 @@ export default function CreateBoardButton({ workspaceId }: { workspaceId: string
               onKeyDown={e => e.key === 'Enter' && handleCreate()}
               autoFocus
               maxLength={20}
-              className="w-full px-4 py-2.5 bg-white text-slate-800 placeholder-slate-400 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm mb-2"
+              className="w-full px-4 py-2.5 bg-[var(--color-surface)] text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] border border-[var(--color-border)] rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--color-brand)] text-sm mb-2"
             />
 
             {error && <p className="text-red-500 text-sm mb-3">{error}</p>}
@@ -107,14 +107,14 @@ export default function CreateBoardButton({ workspaceId }: { workspaceId: string
             <div className="flex gap-3 justify-end mt-3">
               <button
                 onClick={handleClose}
-                className="px-4 py-2 text-sm text-slate-500 hover:text-slate-700 transition-colors"
+                className="px-4 py-2 text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"
               >
                 Cancelar
               </button>
               <button
                 onClick={handleCreate}
                 disabled={loading || !name.trim()}
-                className="bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                className="bg-[var(--color-brand)] text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-[var(--color-brand-hover)] disabled:opacity-50 transition-colors"
               >
                 {loading ? 'Creando...' : 'Crear'}
               </button>

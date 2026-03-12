@@ -13,8 +13,8 @@ interface ModalProps {
 
 const sizeClasses = {
   sm: 'max-w-sm',
-  md: 'max-w-lg',
-  lg: 'max-w-2xl',
+  md: 'w-full sm:max-w-lg',
+  lg: 'w-full sm:max-w-2xl',
 }
 
 export function Modal({ children, onClose, className, size = 'md' }: ModalProps) {
@@ -44,7 +44,7 @@ export function Modal({ children, onClose, className, size = 'md' }: ModalProps)
     >
       <div
         className={cn(
-          'bg-white rounded-2xl shadow-2xl w-full my-12 animate-scale-in',
+          'bg-[var(--color-surface)] rounded-2xl shadow-2xl w-full my-12 animate-scale-in',
           sizeClasses[size],
           className
         )}
@@ -78,12 +78,12 @@ export function ConfirmModal({
   return (
     <Modal onClose={onCancel} size="sm">
       <div className="p-6">
-        <h3 className="text-base font-semibold text-slate-800 mb-2">{title}</h3>
-        <p className="text-sm text-slate-500 mb-6">{message}</p>
+        <h3 className="text-base font-semibold text-[var(--color-text-primary)] mb-2">{title}</h3>
+        <p className="text-sm text-[var(--color-text-secondary)] mb-6">{message}</p>
         <div className="flex gap-3 justify-end">
           <button
             onClick={onCancel}
-            className="px-4 py-2 text-sm text-slate-500 hover:text-slate-700 transition-colors"
+            className="px-4 py-2 text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"
           >
             {cancelLabel}
           </button>
@@ -93,7 +93,7 @@ export function ConfirmModal({
               'px-4 py-2 rounded-xl text-sm font-medium text-white transition-colors',
               danger
                 ? 'bg-red-500 hover:bg-red-600'
-                : 'bg-blue-600 hover:bg-blue-700'
+                : 'bg-[var(--color-brand)] hover:bg-[var(--color-brand-hover)]'
             )}
           >
             {confirmLabel}
