@@ -1,17 +1,18 @@
 @import "tailwindcss";
 
-/* ─── Design Tokens ───────────────────────────────────────── */
-:root {
+/* ─── Design Tokens (Light Mode) ──────────────────────────── */
+:root, [data-theme="light"] {
   /* Brand */
-  --color-brand:       #2563eb;
-  --color-brand-hover: #1d4ed8;
+  --color-brand:       #0078d4;
+  --color-brand-hover: #0064b0;
   --color-brand-light: #eff6ff;
 
   /* Neutral palette */
-  --color-bg:          #f8fafc;
+  --color-bg:          #ffffff;
+  --color-bg-secondary: #f5f7fa;
   --color-surface:     #ffffff;
-  --color-border:      #e2e8f0;
-  --color-border-soft: #f1f5f9;
+  --color-border:      #d9dcde;
+  --color-border-soft: #e8eaed;
 
   /* Text */
   --color-text-primary:   #0f172a;
@@ -36,6 +37,43 @@
   --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.05);
 }
 
+/* ─── Design Tokens (Dark Mode) ───────────────────────────── */
+[data-theme="dark"] {
+  /* Brand */
+  --color-brand:       #0078d4;
+  --color-brand-hover: #1084d7;
+  --color-brand-light: #eff6ff;
+
+  /* Neutral palette */
+  --color-bg:          #0d1117;
+  --color-bg-secondary: #161b22;
+  --color-surface:     #1c2128;
+  --color-border:      #30363d;
+  --color-border-soft: #21262d;
+
+  /* Text */
+  --color-text-primary:   #c9d1d9;
+  --color-text-secondary: #8b949e;
+  --color-text-muted:     #6e7681;
+
+  /* Danger */
+  --color-danger:       #f85149;
+  --color-danger-light: #3d0f0a;
+
+  /* Misc */
+  --radius-sm:  0.5rem;
+  --radius-md:  0.75rem;
+  --radius-lg:  1rem;
+  --radius-xl:  1.25rem;
+  --radius-2xl: 1.5rem;
+
+  /* Shadow */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.2);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.3), 0 2px 4px -2px rgb(0 0 0 / 0.25);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.35);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.5), 0 8px 10px -6px rgb(0 0 0 / 0.45);
+}
+
 /* ─── Base ───────────────────────────────────────────────────*/
 *, *::before, *::after {
   box-sizing: border-box;
@@ -52,6 +90,7 @@ body {
   background-color: var(--color-bg);
   color: var(--color-text-primary);
   line-height: 1.5;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* ─── Input color-scheme fix ──────────────────────────────── */
@@ -61,7 +100,15 @@ input[type="password"],
 input[type="date"],
 textarea,
 select {
-  color-scheme: light;
+  color-scheme: light dark;
+  background-color: var(--color-surface);
+  color: var(--color-text-primary);
+  border-color: var(--color-border);
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+input::placeholder {
+  color: var(--color-text-muted);
 }
 
 /* ─── Custom scrollbar ────────────────────────────────────── */
@@ -73,11 +120,11 @@ select {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: var(--color-border);
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: var(--color-text-muted);
 }
 
 /* ─── Animations ──────────────────────────────────────────── */
@@ -111,19 +158,22 @@ select {
   overflow-x: auto;
   overflow-y: hidden;
   scrollbar-width: thin;
-  scrollbar-color: rgba(255,255,255,0.3) transparent;
+  scrollbar-color: var(--color-border) transparent;
   -webkit-overflow-scrolling: touch;
 }
 .board-scroll::-webkit-scrollbar {
   height: 8px;
 }
 .board-scroll::-webkit-scrollbar-track {
-  background: rgba(0,0,0,0.1);
+  background: var(--color-bg-secondary);
   border-radius: 999px;
 }
 .board-scroll::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,0.35);
+  background: var(--color-border);
   border-radius: 999px;
+}
+.board-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-muted);
 }
 
 /* ─── Column scroll (vertical) ────────────────────────────── */
@@ -131,5 +181,5 @@ select {
   overflow-y: auto;
   overscroll-behavior: contain;
   scrollbar-width: thin;
-  scrollbar-color: #e2e8f0 transparent;
+  scrollbar-color: var(--color-border) transparent;
 }

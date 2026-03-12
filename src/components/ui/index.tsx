@@ -2,3 +2,4 @@
 export { Logo } from './Logo'
 export { Modal, ConfirmModal } from './Modal'
 export { Spinner } from './Spinner'
+export { SidebarClient } from './SidebarClient'

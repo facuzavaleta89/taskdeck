@@ -64,7 +64,7 @@ export default function CreateWorkspaceButton() {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-blue-700 transition-all hover:shadow-md flex items-center gap-1.5"
+        className="bg-[var(--color-brand)] text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-[var(--color-brand-hover)] transition-all hover:shadow-md flex items-center gap-1.5"
       >
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
@@ -76,8 +76,8 @@ export default function CreateWorkspaceButton() {
       {open && (
         <Modal onClose={handleClose} size="sm">
           <div className="p-6">
-            <h3 className="text-base font-semibold text-slate-800 mb-1">Crear workspace</h3>
-            <p className="text-sm text-slate-400 mb-5">Un workspace agrupa tus tableros y miembros.</p>
+            <h3 className="text-base font-semibold text-[var(--color-text-primary)] mb-1">Crear workspace</h3>
+            <p className="text-sm text-[var(--color-text-secondary)] mb-5">Un workspace agrupa tus tableros y miembros.</p>
 
             <input
               type="text"
@@ -86,12 +86,12 @@ export default function CreateWorkspaceButton() {
               onChange={e => setName(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleCreate()}
               autoFocus
-              className="w-full px-4 py-2.5 bg-white text-slate-800 placeholder-slate-400 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm mb-1"
+              className="w-full px-4 py-2.5 bg-[var(--color-surface)] text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] border border-[var(--color-border)] rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--color-brand)] text-sm mb-1"
             />
 
             {name && (
-              <p className="text-xs text-slate-400 mb-3 px-1">
-                URL: <span className="font-mono text-slate-500">/{slugify(name)}</span>
+              <p className="text-xs text-[var(--color-text-secondary)] mb-3 px-1">
+                URL: <span className="font-mono text-[var(--color-text-muted)]">/{slugify(name)}</span>
               </p>
             )}
 
@@ -100,14 +100,14 @@ export default function CreateWorkspaceButton() {
             <div className="flex gap-3 justify-end mt-4">
               <button
                 onClick={handleClose}
-                className="px-4 py-2 text-sm text-slate-500 hover:text-slate-700 transition-colors"
+                className="px-4 py-2 text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"
               >
                 Cancelar
               </button>
               <button
                 onClick={handleCreate}
                 disabled={loading || !name.trim()}
-                className="bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                className="bg-[var(--color-brand)] text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-[var(--color-brand-hover)] disabled:opacity-50 transition-colors"
               >
                 {loading ? 'Creando...' : 'Crear'}
               </button>

@@ -85,23 +85,23 @@ export default function LabelsManager({ boardId, initialLabels, onLabelsChange }
       {open && (
         <Modal onClose={() => setOpen(false)} size="sm">
           <div className="p-6">
-            <h3 className="text-lg font-bold text-slate-800 mb-5">Etiquetas del tablero</h3>
+            <h3 className="text-lg font-bold text-[var(--color-text-primary)] mb-5">Etiquetas del tablero</h3>
 
             <div className="space-y-2 mb-4">
               {labels.length === 0 && (
-                <p className="text-sm text-slate-400 text-center py-4">No hay etiquetas todavía.</p>
+                <p className="text-sm text-[var(--color-text-muted)] text-center py-4">No hay etiquetas todavía.</p>
               )}
               {labels.map(label => (
                 <div key={label.id}>
                   {editingId === label.id ? (
-                    <div className="border border-slate-200 rounded-xl p-4 space-y-3 bg-slate-50">
+                    <div className="border border-[var(--color-border)] rounded-xl p-4 space-y-3 bg-[var(--color-bg-secondary)]">
                       <input
                         type="text"
                         value={editName}
                         onChange={e => setEditName(e.target.value)}
                         onKeyDown={e => { if (e.key === 'Enter') handleSaveEdit(label.id); if (e.key === 'Escape') setEditingId(null) }}
                         autoFocus
-                        className="w-full px-3 py-2 text-sm text-slate-800 bg-white placeholder-slate-400 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+                        className="w-full px-3 py-2 text-sm text-[var(--color-text-primary)] bg-[var(--color-surface)] placeholder-[var(--color-text-muted)] border border-[var(--color-border)] rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
                       />
                       <div className="flex gap-2 flex-wrap">
                         {PRESET_COLORS.map(c => (
@@ -120,7 +120,7 @@ export default function LabelsManager({ boardId, initialLabels, onLabelsChange }
                       <div className="flex justify-between items-center mt-2">
                         <button
                           onClick={() => setConfirmDelete(label)}
-                          className="text-slate-400 hover:text-red-500 w-8 h-8 flex items-center justify-center rounded-lg hover:bg-red-50 transition-colors"
+                          className="text-[var(--color-text-muted)] hover:text-red-500 w-8 h-8 flex items-center justify-center rounded-lg hover:bg-red-50 transition-colors"
                           title="Eliminar"
                         >
                           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -128,7 +128,7 @@ export default function LabelsManager({ boardId, initialLabels, onLabelsChange }
                           </svg>
                         </button>
                         <div className="flex gap-2">
-                          <button onClick={() => setEditingId(null)} className="text-sm text-slate-500 hover:text-slate-700 px-3 py-1.5 transition-colors">Cancelar</button>
+                          <button onClick={() => setEditingId(null)} className="text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] px-3 py-1.5 transition-colors">Cancelar</button>
                           <button
                             onClick={() => handleSaveEdit(label.id)}
                             className="bg-blue-600 text-white px-3 py-1.5 rounded-xl text-sm font-medium hover:bg-blue-700 transition-colors"
@@ -141,15 +141,15 @@ export default function LabelsManager({ boardId, initialLabels, onLabelsChange }
                   ) : (
                     <div className="flex items-center gap-3 group">
                       <div
-                        className="flex-1 flex items-center gap-3 px-3 py-2 rounded-xl cursor-pointer hover:bg-slate-50 transition-colors border border-transparent hover:border-slate-200"
+                        className="flex-1 flex items-center gap-3 px-3 py-2 rounded-xl cursor-pointer hover:bg-[var(--color-bg-secondary)] transition-colors border border-transparent hover:border-[var(--color-border)]"
                         onClick={() => startEdit(label)}
                       >
                         <span className="w-10 h-6 rounded-lg flex-shrink-0" style={{ backgroundColor: label.color }} />
-                        <span className="text-sm text-slate-700">{label.name || <span className="text-slate-400 italic">Sin nombre</span>}</span>
+                        <span className="text-sm text-[var(--color-text-primary)]">{label.name || <span className="text-[var(--color-text-muted)] italic">Sin nombre</span>}</span>
                       </div>
                       <button
                         onClick={() => setConfirmDelete(label)}
-                        className="text-slate-300 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center w-8 h-8 rounded-lg hover:bg-red-50"
+                        className="text-[var(--color-text-muted)] hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center w-8 h-8 rounded-lg hover:bg-red-50"
                         title="Eliminar"
                       >
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -163,7 +163,7 @@ export default function LabelsManager({ boardId, initialLabels, onLabelsChange }
             </div>
 
             {creating ? (
-              <div className="border border-slate-200 rounded-xl p-4 space-y-3 bg-slate-50 animate-scale-in">
+              <div className="border border-[var(--color-border)] rounded-xl p-4 space-y-3 bg-[var(--color-bg-secondary)] animate-scale-in">
                 <input
                   type="text"
                   placeholder="Nombre de la etiqueta"
@@ -171,7 +171,7 @@ export default function LabelsManager({ boardId, initialLabels, onLabelsChange }
                   onChange={e => setNewName(e.target.value)}
                   onKeyDown={e => { if (e.key === 'Enter') handleCreate(); if (e.key === 'Escape') setCreating(false) }}
                   autoFocus
-                  className="w-full px-3 py-2 text-sm text-slate-800 bg-white placeholder-slate-400 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+                  className="w-full px-3 py-2 text-sm text-[var(--color-text-primary)] bg-[var(--color-surface)] placeholder-[var(--color-text-muted)] border border-[var(--color-border)] rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
                 />
                 <div className="flex gap-2 flex-wrap">
                   {PRESET_COLORS.map(c => (
@@ -189,10 +189,10 @@ export default function LabelsManager({ boardId, initialLabels, onLabelsChange }
                 </div>
                 <div className="flex items-center gap-2 px-1">
                   <div className="w-10 h-6 rounded-lg flex-shrink-0" style={{ backgroundColor: newColor }} />
-                  <span className="text-sm text-slate-600">{newName || <span className="text-slate-400 italic">Vista previa</span>}</span>
+                  <span className="text-sm text-[var(--color-text-primary)]">{newName || <span className="text-[var(--color-text-muted)] italic">Vista previa</span>}</span>
                 </div>
                 <div className="flex gap-2 justify-end mt-2">
-                  <button onClick={() => { setCreating(false); setNewName('') }} className="text-sm text-slate-500 hover:text-slate-700 px-3 py-1.5 transition-colors">Cancelar</button>
+                  <button onClick={() => { setCreating(false); setNewName('') }} className="text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] px-3 py-1.5 transition-colors">Cancelar</button>
                   <button
                     onClick={handleCreate}
                     disabled={!newName.trim()}
@@ -205,7 +205,7 @@ export default function LabelsManager({ boardId, initialLabels, onLabelsChange }
             ) : (
               <button
                 onClick={() => setCreating(true)}
-                className="w-full border-2 border-dashed border-slate-200 text-slate-500 hover:text-slate-700 hover:border-slate-300 hover:bg-slate-50 py-3 rounded-xl text-sm font-medium transition-colors flex items-center justify-center gap-2"
+                className="w-full border-2 border-dashed border-[var(--color-border)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:border-[var(--color-border)] hover:bg-[var(--color-bg-secondary)] py-3 rounded-xl text-sm font-medium transition-colors flex items-center justify-center gap-2"
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />

@@ -56,30 +56,30 @@ function RegisterForm() {
 
   if (success) {
     return (
-      <div className="bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl p-8 text-center animate-scale-in">
+      <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl shadow-2xl p-6 sm:p-8 text-center animate-scale-in">
         <div className="w-16 h-16 bg-blue-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
           <svg className="w-8 h-8 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
           </svg>
         </div>
-        <h2 className="text-xl font-bold text-white mb-2">Revisá tu email</h2>
-        <p className="text-slate-400 text-sm">
+        <h2 className="text-xl font-bold text-[var(--color-text-primary)] mb-2">Revisá tu email</h2>
+        <p className="text-[var(--color-text-secondary)] text-sm">
           Enviamos un link de confirmación a{' '}
-          <span className="text-white font-medium">{email}</span>
+          <span className="text-[var(--color-text-primary)] font-medium">{email}</span>
         </p>
       </div>
     )
   }
 
   return (
-    <div className="bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl p-8 animate-fade-in">
-      <h1 className="text-2xl font-bold text-white mb-1">Crear cuenta</h1>
-      <p className="text-slate-400 text-sm mb-8">Gratis, siempre</p>
+    <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl shadow-2xl p-6 sm:p-8 animate-fade-in">
+      <h1 className="text-xl sm:text-2xl font-bold text-[var(--color-text-primary)] mb-1">Crear cuenta</h1>
+      <p className="text-[var(--color-text-secondary)] text-sm mb-8">Gratis, siempre</p>
 
       <div className="space-y-4">
         {/* Nombre */}
         <div>
-          <label htmlFor="fullName" className="block text-xs font-medium text-slate-400 mb-1.5">
+          <label htmlFor="fullName" className="block text-xs font-medium text-[var(--color-text-muted)] mb-1.5">
             Nombre completo
           </label>
           <input
@@ -89,13 +89,13 @@ function RegisterForm() {
             value={fullName}
             onChange={e => setFullName(e.target.value)}
             disabled={loading}
-            className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm transition-colors disabled:opacity-60"
+            className="w-full px-4 py-3 bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-xl text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-brand)] focus:border-transparent text-sm transition-colors disabled:opacity-60"
           />
         </div>
 
         {/* Email */}
         <div>
-          <label htmlFor="email" className="block text-xs font-medium text-slate-400 mb-1.5">
+          <label htmlFor="email" className="block text-xs font-medium text-[var(--color-text-muted)] mb-1.5">
             Email
           </label>
           <input
@@ -105,13 +105,13 @@ function RegisterForm() {
             value={email}
             onChange={e => setEmail(e.target.value)}
             disabled={loading}
-            className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm transition-colors disabled:opacity-60"
+            className="w-full px-4 py-3 bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-xl text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-brand)] focus:border-transparent text-sm transition-colors disabled:opacity-60"
           />
         </div>
 
         {/* Contraseña */}
         <div>
-          <label htmlFor="password" className="block text-xs font-medium text-slate-400 mb-1.5">
+          <label htmlFor="password" className="block text-xs font-medium text-[var(--color-text-muted)] mb-1.5">
             Contraseña
           </label>
           <input
@@ -122,7 +122,7 @@ function RegisterForm() {
             onChange={e => setPassword(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && handleRegister()}
             disabled={loading}
-            className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm transition-colors disabled:opacity-60"
+            className="w-full px-4 py-3 bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-xl text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-brand)] focus:border-transparent text-sm transition-colors disabled:opacity-60"
           />
         </div>
 
@@ -139,33 +139,33 @@ function RegisterForm() {
         <button
           onClick={handleRegister}
           disabled={loading}
-          className="w-full bg-blue-600 hover:bg-blue-500 text-white py-3 rounded-xl font-medium disabled:opacity-60 transition-all hover:shadow-lg hover:shadow-blue-500/20 text-sm flex items-center justify-center gap-2"
+          className="w-full bg-[var(--color-brand)] hover:bg-[var(--color-brand-hover)] text-white py-3 rounded-xl font-medium disabled:opacity-60 transition-all hover:shadow-lg text-sm flex items-center justify-center gap-2"
         >
           {loading ? <><Spinner size="sm" /> Creando cuenta...</> : 'Crear cuenta'}
         </button>
 
         <div className="relative my-1">
           <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-slate-700" />
+            <div className="w-full border-t border-[var(--color-border)]" />
           </div>
           <div className="relative flex justify-center text-xs">
-            <span className="px-3 bg-slate-800 text-slate-500">o continuá con</span>
+            <span className="px-3 bg-[var(--color-surface)] text-[var(--color-text-muted)]">o continuá con</span>
           </div>
         </div>
 
         <button
           onClick={handleGoogleLogin}
           disabled={loading}
-          className="w-full border border-slate-700 hover:border-slate-500 bg-slate-900 hover:bg-slate-800 py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-3 text-sm text-white disabled:opacity-60"
+          className="w-full border border-[var(--color-border)] hover:border-[var(--color-border-soft)] bg-[var(--color-bg-secondary)] hover:bg-[var(--color-border)] py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-3 text-sm text-[var(--color-text-primary)] disabled:opacity-60"
         >
           <GoogleIcon />
           Google
         </button>
       </div>
 
-      <p className="text-center text-sm text-slate-500 mt-6">
+      <p className="text-center text-sm text-[var(--color-text-secondary)] mt-6">
         ¿Ya tenés cuenta?{' '}
-        <Link href="/login" className="text-blue-400 font-medium hover:text-blue-300 transition-colors">
+        <Link href="/login" className="text-[var(--color-brand)] font-medium hover:text-[var(--color-brand-hover)] transition-colors">
           Iniciá sesión
         </Link>
       </p>

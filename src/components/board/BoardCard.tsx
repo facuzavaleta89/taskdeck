@@ -68,17 +68,17 @@ export default function BoardCard({ board, slug, isOwner }: Props) {
             {menuOpen && (
               <>
                 <div className="fixed inset-0 z-40" onClick={(e) => { e.preventDefault(); setMenuOpen(false); }} />
-                <div className="absolute bg-white border border-slate-200 rounded-xl shadow-xl z-50 w-40 py-1.5 overflow-hidden animate-scale-in origin-top-right right-2.5 top-10">
+                <div className="absolute bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl shadow-xl z-50 w-40 py-1.5 overflow-hidden animate-scale-in origin-top-right right-2.5 top-10">
                   <button
                     onClick={(e) => { e.preventDefault(); setEditOpen(true); setMenuOpen(false); }}
-                    className="w-full text-left px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                    className="w-full text-left px-4 py-2.5 text-sm text-[var(--color-text-primary)] hover:bg-[var(--color-bg-secondary)] transition-colors"
                   >
                     Editar
                   </button>
-                  <div className="mx-3 my-1 h-px bg-slate-100" />
+                  <div className="mx-3 my-1 h-px bg-[var(--color-border)]" />
                   <button
                     onClick={(e) => { e.preventDefault(); setConfirmDelete(true); setMenuOpen(false); }}
-                    className="w-full text-left px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 transition-colors"
+                    className="w-full text-left px-4 py-2.5 text-sm text-red-500 hover:bg-red-500/10 transition-colors"
                   >
                     Eliminar
                   </button>
@@ -95,7 +95,7 @@ export default function BoardCard({ board, slug, isOwner }: Props) {
       {editOpen && (
         <Modal onClose={() => setEditOpen(false)} size="sm">
           <div className="p-6">
-            <h3 className="text-base font-semibold text-slate-800 mb-4">Editar tablero</h3>
+            <h3 className="text-base font-semibold text-[var(--color-text-primary)] mb-4">Editar tablero</h3>
 
             {/* Preview */}
             <div
@@ -114,7 +114,7 @@ export default function BoardCard({ board, slug, isOwner }: Props) {
                   className="w-8 h-8 rounded-lg transition-all hover:scale-110"
                   style={{
                     backgroundColor: c,
-                    outline: color === c ? '2px solid #1d4ed8' : 'none',
+                    outline: color === c ? '2px solid var(--color-brand)' : 'none',
                     outlineOffset: '2px',
                   }}
                 />
@@ -129,17 +129,17 @@ export default function BoardCard({ board, slug, isOwner }: Props) {
               autoFocus
               maxLength={20}
               placeholder="Máx. 20 caracteres"
-              className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-800 text-sm mb-4"
+              className="w-full px-4 py-2.5 border border-[var(--color-border)] rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--color-brand)] text-[var(--color-text-primary)] text-sm mb-4 bg-[var(--color-surface)]"
             />
 
             <div className="flex gap-3 justify-end">
-              <button onClick={() => setEditOpen(false)} className="px-4 py-2 text-sm text-slate-500 hover:text-slate-700 transition-colors">
+              <button onClick={() => setEditOpen(false)} className="px-4 py-2 text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors">
                 Cancelar
               </button>
               <button
                 onClick={handleSave}
                 disabled={loading || !name.trim()}
-                className="bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                className="bg-[var(--color-brand)] text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-[var(--color-brand-hover)] disabled:opacity-50 transition-colors"
               >
                 {loading ? 'Guardando...' : 'Guardar'}
               </button>

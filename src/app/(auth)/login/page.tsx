@@ -34,14 +34,14 @@ function LoginForm() {
   }
 
   return (
-    <div className="bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl p-8 animate-fade-in">
-      <h1 className="text-2xl font-bold text-white mb-1">Bienvenido de vuelta</h1>
-      <p className="text-slate-400 text-sm mb-8">Iniciá sesión para continuar</p>
+    <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl shadow-2xl p-6 sm:p-8 animate-fade-in">
+      <h1 className="text-xl sm:text-2xl font-bold text-[var(--color-text-primary)] mb-1">Bienvenido de vuelta</h1>
+      <p className="text-[var(--color-text-secondary)] text-sm mb-8">Iniciá sesión para continuar</p>
 
       <div className="space-y-4">
         {/* Email */}
         <div>
-          <label htmlFor="email" className="block text-xs font-medium text-slate-400 mb-1.5">
+          <label htmlFor="email" className="block text-xs font-medium text-[var(--color-text-muted)] mb-1.5">
             Email
           </label>
           <input
@@ -51,13 +51,13 @@ function LoginForm() {
             value={email}
             onChange={e => setEmail(e.target.value)}
             disabled={loading}
-            className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm transition-colors disabled:opacity-60"
+            className="w-full px-4 py-3 bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-xl text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-brand)] focus:border-transparent text-sm transition-colors disabled:opacity-60"
           />
         </div>
 
         {/* Password */}
         <div>
-          <label htmlFor="password" className="block text-xs font-medium text-slate-400 mb-1.5">
+          <label htmlFor="password" className="block text-xs font-medium text-[var(--color-text-muted)] mb-1.5">
             Contraseña
           </label>
           <input
@@ -68,7 +68,7 @@ function LoginForm() {
             onChange={e => setPassword(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && handleEmailLogin()}
             disabled={loading}
-            className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm transition-colors disabled:opacity-60"
+            className="w-full px-4 py-3 bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-xl text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-brand)] focus:border-transparent text-sm transition-colors disabled:opacity-60"
           />
         </div>
 
@@ -86,7 +86,7 @@ function LoginForm() {
         <button
           onClick={handleEmailLogin}
           disabled={loading}
-          className="w-full bg-blue-600 hover:bg-blue-500 text-white py-3 rounded-xl font-medium disabled:opacity-60 transition-all hover:shadow-lg hover:shadow-blue-500/20 text-sm flex items-center justify-center gap-2"
+          className="w-full bg-[var(--color-brand)] hover:bg-[var(--color-brand-hover)] text-white py-3 rounded-xl font-medium disabled:opacity-60 transition-all hover:shadow-lg text-sm flex items-center justify-center gap-2"
         >
           {loading ? <><Spinner size="sm" /> Ingresando...</> : 'Ingresar'}
         </button>
@@ -94,10 +94,10 @@ function LoginForm() {
         {/* Divider */}
         <div className="relative my-1">
           <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-slate-700" />
+            <div className="w-full border-t border-[var(--color-border)]" />
           </div>
           <div className="relative flex justify-center text-xs">
-            <span className="px-3 bg-slate-800 text-slate-500">o continuá con</span>
+            <span className="px-3 bg-[var(--color-surface)] text-[var(--color-text-muted)]">o continuá con</span>
           </div>
         </div>
 
@@ -105,16 +105,16 @@ function LoginForm() {
         <button
           onClick={handleGoogleLogin}
           disabled={loading}
-          className="w-full border border-slate-700 hover:border-slate-500 bg-slate-900 hover:bg-slate-800 py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-3 text-sm text-white disabled:opacity-60"
+          className="w-full border border-[var(--color-border)] hover:border-[var(--color-border-soft)] bg-[var(--color-bg-secondary)] hover:bg-[var(--color-border)] py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-3 text-sm text-[var(--color-text-primary)] disabled:opacity-60"
         >
           <GoogleIcon />
           Google
         </button>
       </div>
 
-      <p className="text-center text-sm text-slate-500 mt-6">
+      <p className="text-center text-sm text-[var(--color-text-secondary)] mt-6">
         ¿No tenés cuenta?{' '}
-        <Link href="/register" className="text-blue-400 font-medium hover:text-blue-300 transition-colors">
+        <Link href="/register" className="text-[var(--color-brand)] font-medium hover:text-[var(--color-brand-hover)] transition-colors">
           Registrate gratis
         </Link>
       </p>

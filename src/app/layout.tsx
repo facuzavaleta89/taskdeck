@@ -2,6 +2,9 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import Navbar from '@/components/ui/Navbar'
+import { Sidebar } from '@/components/ui/Sidebar'
+import { ThemeProvider } from '@/components/providers/ThemeProvider'
+import { NavigationProvider } from '@/components/providers/NavigationProvider'
 
 const inter = Inter({
   variable: '--font-inter',
@@ -20,12 +23,22 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es" className={inter.variable}>
-      <body className="antialiased flex flex-col min-h-screen">
-        <Navbar />
-        <div className="flex-1 flex flex-col">
-          {children}
-        </div>
+    <html lang="es" className={inter.variable} suppressHydrationWarning>
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+      </head>
+      <body className="antialiased flex flex-col min-h-screen bg-[var(--color-bg)] text-[var(--color-text-primary)]">
+        <ThemeProvider>
+          <NavigationProvider>
+            <Navbar />
+            <div className="flex flex-1 overflow-hidden">
+              <Sidebar />
+              <div className="flex-1 flex flex-col overflow-hidden">
+                {children}
+              </div>
+            </div>
+          </NavigationProvider>
+        </ThemeProvider>
       </body>
     </html>
   )
