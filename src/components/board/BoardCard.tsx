@@ -18,13 +18,13 @@ interface Props {
 }
 
 export default function BoardCard({ board, slug, isOwner }: Props) {
-  const [menuOpen, setMenuOpen]   = useState(false)
-  const [editOpen, setEditOpen]   = useState(false)
+  const [menuOpen,      setMenuOpen]      = useState(false)
+  const [editOpen,      setEditOpen]      = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
-  const [name, setName]   = useState(board.name)
-  const [color, setColor] = useState(board.color)
+  const [name,    setName]    = useState(board.name)
+  const [color,   setColor]   = useState(board.color)
   const [loading, setLoading] = useState(false)
-  const router = useRouter()
+  const router   = useRouter()
   const supabase = createClient()
 
   async function handleSave() {
@@ -43,53 +43,67 @@ export default function BoardCard({ board, slug, isOwner }: Props) {
 
   return (
     <>
-      <div className="relative rounded-xl shadow-sm group">
-        <Link
-          href={`/workspace/${slug}/board/${board.id}`}
-          className="block p-5 text-white font-semibold text-base hover:brightness-90 transition-all rounded-xl min-h-[140px] flex items-start break-words overflow-hidden"
-          style={{ backgroundColor: color }}
-        >
-          {name}
+      <div className="bg-[var(--color-surface)] rounded-2xl border border-[var(--color-border)] hover:border-[var(--color-brand)]/50 hover:shadow-lg transition-all duration-200 group">
+
+        {/* Color banner */}
+        <Link href={`/workspace/${slug}/board/${board.id}`} className="block">
+          <div
+            className="w-full h-24 hover:brightness-90 transition-all rounded-t-2xl"
+            style={{ backgroundColor: color }}
+          />
         </Link>
 
-        {isOwner && (
-          <>
-            <button
-              onClick={e => { e.preventDefault(); setMenuOpen(v => !v) }}
-              className="absolute top-2.5 right-2.5 text-white/70 hover:text-white w-7 h-7 flex items-center justify-center rounded-lg hover:bg-black/25 transition-all opacity-0 group-hover:opacity-100 z-10"
-              title="Opciones"
+        {/* Content */}
+        <Link href={`/workspace/${slug}/board/${board.id}`} className="block px-5 pt-4 pb-2">
+          <h3 className="font-semibold text-[var(--color-text-primary)] text-sm truncate">{board.name}</h3>
+          <p className="text-[var(--color-text-muted)] text-xs mt-0.5">Tablero</p>
+        </Link>
+
+        {/* Footer */}
+        <div className="px-5 pb-4 flex justify-end border-t border-[var(--color-border)] pt-3 mt-2 relative">
+          {isOwner ? (
+            <>
+              <button
+                onClick={e => { e.preventDefault(); setMenuOpen(v => !v) }}
+                className="text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)] transition-colors p-1.5 rounded-lg hover:bg-[var(--color-bg-secondary)]"
+                title="Opciones"
+              >
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <circle cx="5" cy="12" r="2" /><circle cx="12" cy="12" r="2" /><circle cx="19" cy="12" r="2" />
+                </svg>
+              </button>
+
+              {menuOpen && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={e => { e.preventDefault(); setMenuOpen(false) }} />
+                  <div className="absolute bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl shadow-xl z-50 w-40 py-1.5 animate-scale-in origin-top-right right-5 top-12">
+                    <button
+                      onClick={e => { e.preventDefault(); setEditOpen(true); setMenuOpen(false) }}
+                      className="w-full text-left px-4 py-2.5 text-sm text-[var(--color-text-primary)] hover:bg-[var(--color-bg-secondary)] transition-colors"
+                    >
+                      Editar
+                    </button>
+                    <div className="mx-3 my-1 h-px bg-[var(--color-border)]" />
+                    <button
+                      onClick={e => { e.preventDefault(); setConfirmDelete(true); setMenuOpen(false) }}
+                      className="w-full text-left px-4 py-2.5 text-sm text-red-500 hover:bg-red-500/10 transition-colors"
+                    >
+                      Eliminar
+                    </button>
+                  </div>
+                </>
+              )}
+            </>
+          ) : (
+            <Link
+              href={`/workspace/${slug}/board/${board.id}`}
+              className="text-xs text-[var(--color-text-muted)] hover:text-[var(--color-brand)] transition-colors px-2 py-1 rounded-lg hover:bg-[var(--color-bg-secondary)]"
             >
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                <circle cx="5" cy="12" r="2" /><circle cx="12" cy="12" r="2" /><circle cx="19" cy="12" r="2" />
-              </svg>
-            </button>
-
-            {/* Dropdown */}
-            {menuOpen && (
-              <>
-                <div className="fixed inset-0 z-40" onClick={(e) => { e.preventDefault(); setMenuOpen(false); }} />
-                <div className="absolute bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl shadow-xl z-50 w-40 py-1.5 overflow-hidden animate-scale-in origin-top-right right-2.5 top-10">
-                  <button
-                    onClick={(e) => { e.preventDefault(); setEditOpen(true); setMenuOpen(false); }}
-                    className="w-full text-left px-4 py-2.5 text-sm text-[var(--color-text-primary)] hover:bg-[var(--color-bg-secondary)] transition-colors"
-                  >
-                    Editar
-                  </button>
-                  <div className="mx-3 my-1 h-px bg-[var(--color-border)]" />
-                  <button
-                    onClick={(e) => { e.preventDefault(); setConfirmDelete(true); setMenuOpen(false); }}
-                    className="w-full text-left px-4 py-2.5 text-sm text-red-500 hover:bg-red-500/10 transition-colors"
-                  >
-                    Eliminar
-                  </button>
-                </div>
-              </>
-            )}
-          </>
-        )}
+              Abrir tablero →
+            </Link>
+          )}
+        </div>
       </div>
-
-
 
       {/* Edit modal */}
       {editOpen && (
@@ -97,7 +111,6 @@ export default function BoardCard({ board, slug, isOwner }: Props) {
           <div className="p-6">
             <h3 className="text-base font-semibold text-[var(--color-text-primary)] mb-4">Editar tablero</h3>
 
-            {/* Preview */}
             <div
               className="w-full h-16 rounded-xl mb-4 flex items-center px-4 text-white font-semibold text-sm"
               style={{ backgroundColor: color }}
@@ -105,7 +118,6 @@ export default function BoardCard({ board, slug, isOwner }: Props) {
               {name || 'Vista previa'}
             </div>
 
-            {/* Color picker */}
             <div className="flex gap-2 mb-4 flex-wrap">
               {COLORS.map(c => (
                 <button

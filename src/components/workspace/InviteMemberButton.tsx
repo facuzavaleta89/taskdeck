@@ -1,28 +1,33 @@
 'use client'
 
 import { useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
 import { Modal } from '@/components/ui/Modal'
 
-export default function InviteMemberButton({ workspaceId }: { workspaceId: string }) {
+export default function InviteMemberButton({ workspaceId, workspaceName }: { workspaceId: string, workspaceName: string }) {
   const [open, setOpen]       = useState(false)
   const [email, setEmail]     = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError]     = useState('')
   const [success, setSuccess] = useState(false)
-  const supabase = createClient()
 
   async function handleInvite() {
     if (!email.trim()) return
     setLoading(true)
     setError('')
 
-    const { error: err } = await supabase.from('invitations').insert({
-      workspace_id: workspaceId,
-      email: email.trim().toLowerCase(),
+    const res = await fetch('/api/invite', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, workspaceId, workspaceName }),
     })
 
-    if (err) { setError(err.message); setLoading(false); return }
+    const data = await res.json()
+
+    if (!res.ok) {
+      setError(data.error || 'Error al enviar la invitación')
+      setLoading(false)
+      return
+    }
 
     setSuccess(true)
     setLoading(false)
@@ -60,7 +65,7 @@ export default function InviteMemberButton({ workspaceId }: { workspaceId: strin
                 </div>
                 <h3 className="text-base font-semibold text-slate-800 mb-1">Invitación enviada</h3>
                 <p className="text-sm text-slate-400">
-                  Cuando <strong className="text-slate-600">{email}</strong> se registre con ese email, tendrá acceso automáticamente.
+                  Le enviamos un email a <strong className="text-slate-600">{email}</strong> con el link para unirse.
                 </p>
                 <button
                   onClick={handleClose}

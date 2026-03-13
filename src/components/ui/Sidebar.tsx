@@ -12,20 +12,26 @@ export async function Sidebar() {
   }
 
   const displayName = profile?.full_name ?? user?.email ?? 'Usuario'
-  const email = user?.email ?? ''
-  const initials = profile?.full_name
+  const email       = user?.email ?? ''
+  const initials    = profile?.full_name
     ? profile.full_name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()
     : user?.email?.[0]?.toUpperCase() ?? '?'
 
-  if (!user) {
-    return null
-  }
+  // Conteo de invitaciones pendientes
+  const { count } = await supabase
+    .from('invitations')
+    .select('*', { count: 'exact', head: true })
+    .eq('email', user?.email ?? '')
+    .eq('accepted', false)
+
+  if (!user) return null
 
   return (
-    <SidebarClient 
-      displayName={displayName} 
-      email={email} 
+    <SidebarClient
+      displayName={displayName}
+      email={email}
       initials={initials}
+      notificationCount={count ?? 0}
     />
   )
 }
