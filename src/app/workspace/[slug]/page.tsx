@@ -43,13 +43,13 @@ export default async function WorkspacePage({ params }: { params: Promise<{ slug
   const isOwner = membership.role === 'owner'
 
   return (
-    <main className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
+    <main className="w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-10 bg-[var(--color-bg)]">
       <WorkspaceNameSetter workspaceName={workspace.name} />
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <h2 className="text-2xl sm:text-3xl font-bold text-[var(--color-text-primary)] truncate">{workspace.name}</h2>
         <div className="flex gap-2 sm:gap-3 flex-shrink-0">
-          {isOwner && <InviteMemberButton workspaceId={workspace.id} />}
+          {isOwner && <InviteMemberButton workspaceId={workspace.id} workspaceName={workspace.name} />}
           <CreateBoardButton workspaceId={workspace.id} />
         </div>
       </div>
