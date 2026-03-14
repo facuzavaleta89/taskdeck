@@ -67,7 +67,7 @@ export default function WorkspaceCard({ workspace, currentUserId, ownerName }: P
   return (
     <>
       <div className="bg-[var(--color-surface)] rounded-2xl border border-[var(--color-border)] hover:border-[var(--color-brand)]/50 hover:shadow-lg transition-all duration-200 group">
-        <Link href={`/workspace/${workspace.slug}`} className="block p-5">
+        <Link href={`/workspace/${workspace.id}`} className="block p-5">
           <div className="flex items-start gap-4">
             <div className={`w-11 h-11 ${bgColor} rounded-xl flex items-center justify-center text-white font-bold text-lg flex-shrink-0`}>
               {letter}

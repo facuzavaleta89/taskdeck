@@ -35,12 +35,12 @@ export default function CardComponent({ card, labels, onUpdate, onDelete, isDrag
   }
 
   const cardLabels: CardLabel[] = card.labels ?? []
-  const isOverdue  = card.due_date && !card.completed && new Date(card.due_date) < new Date()
-  
-  const checklistItems = card.checklist_items ?? []
-  const checklistTotal = checklistItems.length
+  const isOverdue = card.due_date && !card.completed && new Date(card.due_date) < new Date()
+
+  const checklistItems     = card.checklist_items ?? []
+  const checklistTotal     = checklistItems.length
   const checklistCompleted = checklistItems.filter(i => i.completed).length
-  const checklistDone = checklistTotal > 0 && checklistCompleted === checklistTotal
+  const checklistDone      = checklistTotal > 0 && checklistCompleted === checklistTotal
 
   return (
     <>
@@ -50,7 +50,8 @@ export default function CardComponent({ card, labels, onUpdate, onDelete, isDrag
         {...attributes}
         {...listeners}
         className={cn(
-          'bg-[var(--color-surface)] rounded-xl shadow-sm p-3 border border-[var(--color-border)] cursor-grab active:cursor-grabbing',
+          'bg-[var(--color-surface)] rounded-xl p-3 border border-[var(--color-border)]',
+          'cursor-grab active:cursor-grabbing select-none',
           'hover:border-[var(--color-brand)]/50 hover:shadow-md transition-all duration-150',
           (isDragging || isSortableDragging) && 'opacity-40 scale-95',
           card.completed && 'opacity-60',
@@ -59,7 +60,7 @@ export default function CardComponent({ card, labels, onUpdate, onDelete, isDrag
       >
         {/* Label pills */}
         {cardLabels.length > 0 && (
-          <div className="flex gap-1 flex-wrap mb-2">
+          <div className="flex gap-1 flex-wrap mb-2.5">
             {cardLabels.map((cl: CardLabel) => (
               <span
                 key={cl.label_id}
@@ -71,7 +72,7 @@ export default function CardComponent({ card, labels, onUpdate, onDelete, isDrag
           </div>
         )}
 
-        {/* Checkbox + title row */}
+        {/* Checkbox + title */}
         <div className="flex items-start gap-2">
           <input
             type="checkbox"
@@ -87,15 +88,17 @@ export default function CardComponent({ card, labels, onUpdate, onDelete, isDrag
           />
           <div className="flex-1 min-w-0">
             <span className={cn(
-              'text-sm font-medium leading-tight block break-words',
-              card.completed ? 'line-through text-[var(--color-text-muted)]' : 'text-[var(--color-text-primary)]',
+              'text-sm font-medium leading-snug block break-words',
+              card.completed
+                ? 'line-through text-[var(--color-text-muted)]'
+                : 'text-[var(--color-text-primary)]',
             )}>
               {card.title}
             </span>
-
-            {/* Description snippet */}
             {card.description && (
-              <p className="text-xs text-[var(--color-text-secondary)] mt-1 line-clamp-2 leading-relaxed break-words">{card.description}</p>
+              <p className="text-xs text-[var(--color-text-muted)] mt-1 line-clamp-2 leading-relaxed break-words">
+                {card.description}
+              </p>
             )}
           </div>
         </div>
@@ -103,7 +106,7 @@ export default function CardComponent({ card, labels, onUpdate, onDelete, isDrag
         {/* Meta row */}
         {(checklistTotal > 0 || card.due_date) && (
           <div className="mt-2.5 flex items-center gap-2 flex-wrap">
-            {/* Checklist progress */}
+
             {checklistTotal > 0 && (
               <div className="flex items-center gap-1.5 flex-1 min-w-0">
                 <svg
@@ -121,20 +124,22 @@ export default function CardComponent({ card, labels, onUpdate, onDelete, isDrag
                     }}
                   />
                 </div>
-                <span className={cn('text-xs font-medium flex-shrink-0', checklistDone ? 'text-emerald-600' : 'text-[var(--color-text-muted)]')}>
+                <span className={cn(
+                  'text-xs font-medium flex-shrink-0',
+                  checklistDone ? 'text-emerald-500' : 'text-[var(--color-text-muted)]'
+                )}>
                   {checklistCompleted}/{checklistTotal}
                 </span>
               </div>
             )}
 
-            {/* Due date badge */}
             {card.due_date && (
               <span className={cn(
                 'text-xs px-2 py-0.5 rounded-full font-medium flex-shrink-0 flex items-center gap-1',
                 isOverdue
-                  ? 'bg-red-100 text-red-600'
+                  ? 'bg-red-500/10 text-red-500'
                   : card.completed
-                    ? 'bg-emerald-100 text-emerald-600'
+                    ? 'bg-emerald-500/10 text-emerald-500'
                     : 'bg-[var(--color-bg-secondary)] text-[var(--color-text-secondary)]',
               )}>
                 <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -143,6 +148,7 @@ export default function CardComponent({ card, labels, onUpdate, onDelete, isDrag
                 {new Date(card.due_date).toLocaleDateString('es-AR', { day: '2-digit', month: 'short' })}
               </span>
             )}
+
           </div>
         )}
       </div>

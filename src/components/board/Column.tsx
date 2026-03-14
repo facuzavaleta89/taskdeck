@@ -19,10 +19,10 @@ interface Props {
 }
 
 export default function ColumnComponent({ column, cards, labels, onAddCard, onUpdateCard, onDeleteCard, onDeleteColumn }: Props) {
-  const [addingCard, setAddingCard]     = useState(false)
-  const [newCardTitle, setNewCardTitle] = useState('')
-  const [editingName, setEditingName]   = useState(false)
-  const [columnName, setColumnName]     = useState(column.name)
+  const [addingCard,    setAddingCard]    = useState(false)
+  const [newCardTitle,  setNewCardTitle]  = useState('')
+  const [editingName,   setEditingName]   = useState(false)
+  const [columnName,    setColumnName]    = useState(column.name)
   const [confirmDelete, setConfirmDelete] = useState(false)
   const supabase = createClient()
 
@@ -43,7 +43,13 @@ export default function ColumnComponent({ column, cards, labels, onAddCard, onUp
 
   return (
     <>
-      <div className={`flex-shrink-0 w-full sm:w-96 md:w-72 bg-[var(--color-bg-secondary)] backdrop-blur-sm rounded-xl flex flex-col transition-all duration-150 shadow-sm border border-[var(--color-border)] ${isOver ? 'ring-2 ring-[var(--color-brand)]/40 scale-[1.01]' : ''}`}>
+      <div className={`
+        flex-shrink-0 w-72 flex flex-col rounded-2xl
+        bg-[var(--color-bg-secondary)] border border-[var(--color-border)]
+        shadow-sm transition-all duration-150
+        ${isOver ? 'ring-2 ring-[var(--color-brand)]/50 scale-[1.01]' : ''}
+      `}>
+
         {/* Column header */}
         <div className="px-3 pt-3 pb-2 flex items-center gap-1">
           {editingName ? (
@@ -56,16 +62,18 @@ export default function ColumnComponent({ column, cards, labels, onAddCard, onUp
                 if (e.key === 'Escape') { setColumnName(column.name); setEditingName(false) }
               }}
               autoFocus
-              className="flex-1 px-2 py-1 text-sm font-semibold bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-brand)] border border-[var(--color-border)]"
+              className="flex-1 px-2 py-1 text-sm font-semibold bg-[var(--color-surface)] text-[var(--color-text-primary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-brand)] border border-[var(--color-border)]"
             />
           ) : (
             <button
-              className="flex-1 text-left px-2 py-1 font-semibold text-[var(--color-text-primary)] text-sm cursor-pointer hover:text-[var(--color-text-primary)] rounded-lg hover:bg-[var(--color-border)] transition-colors group"
+              className="flex-1 text-left px-2 py-1 font-semibold text-[var(--color-text-primary)] text-sm rounded-lg hover:bg-[var(--color-border)] transition-colors"
               onClick={() => setEditingName(true)}
               title="Clic para renombrar"
             >
               {columnName}
-              <span className="ml-2 text-[var(--color-text-muted)] font-normal text-xs">{cards.length}</span>
+              <span className="ml-2 text-[var(--color-text-muted)] font-normal text-xs bg-[var(--color-border)] px-1.5 py-0.5 rounded-full">
+                {cards.length}
+              </span>
             </button>
           )}
 
@@ -83,7 +91,7 @@ export default function ColumnComponent({ column, cards, labels, onAddCard, onUp
         {/* Cards area */}
         <div
           ref={setNodeRef}
-          className="flex-1 overflow-y-auto column-scroll px-2 pb-2 space-y-2 min-h-[40px]"
+          className="flex-1 overflow-y-auto px-2 pb-2 space-y-2 min-h-[40px]"
         >
           <SortableContext items={cards.map(c => c.id)} strategy={verticalListSortingStrategy}>
             {cards.map(card => (
@@ -99,7 +107,7 @@ export default function ColumnComponent({ column, cards, labels, onAddCard, onUp
         </div>
 
         {/* Add card area */}
-        <div className="px-2 pb-3 flex-shrink-0">
+        <div className="px-2 pb-2 flex-shrink-0">
           {addingCard ? (
             <div className="bg-[var(--color-surface)] rounded-xl p-3 shadow-sm border border-[var(--color-border)] animate-scale-in">
               <textarea
@@ -112,13 +120,13 @@ export default function ColumnComponent({ column, cards, labels, onAddCard, onUp
                 }}
                 autoFocus
                 rows={2}
-                className="w-full text-sm text-[var(--color-text-primary)] bg-[var(--color-surface)] placeholder-[var(--color-text-muted)] resize-none focus:outline-none overflow-hidden"
+                className="w-full text-sm text-[var(--color-text-primary)] bg-[var(--color-surface)] placeholder-[var(--color-text-muted)] resize-none focus:outline-none"
               />
               <div className="flex gap-2 mt-2">
                 <button
                   onClick={handleAddCard}
                   disabled={!newCardTitle.trim()}
-                  className="bg-[var(--color-brand)] text-white px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-[var(--color-brand-hover)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="bg-[var(--color-brand)] text-white px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-[var(--color-brand-hover)] transition-colors disabled:opacity-50"
                 >
                   Agregar
                 </button>
@@ -144,7 +152,6 @@ export default function ColumnComponent({ column, cards, labels, onAddCard, onUp
         </div>
       </div>
 
-      {/* Confirm delete dialog */}
       {confirmDelete && (
         <ConfirmModal
           title="¿Eliminar lista?"

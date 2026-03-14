@@ -5,11 +5,11 @@ export async function Sidebar() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
+  if (!user) return null
+
   let profile = null
-  if (user) {
-    const { data } = await supabase.from('profiles').select('full_name').eq('id', user.id).single()
-    profile = data
-  }
+  const { data } = await supabase.from('profiles').select('full_name').eq('id', user.id).single()
+  profile = data
 
   const displayName = profile?.full_name ?? user?.email ?? 'Usuario'
   const email       = user?.email ?? ''
@@ -17,14 +17,11 @@ export async function Sidebar() {
     ? profile.full_name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()
     : user?.email?.[0]?.toUpperCase() ?? '?'
 
-  // Conteo de invitaciones pendientes
   const { count } = await supabase
     .from('invitations')
     .select('*', { count: 'exact', head: true })
-    .eq('email', user?.email ?? '')
+    .eq('email', user.email ?? '')
     .eq('accepted', false)
-
-  if (!user) return null
 
   return (
     <SidebarClient

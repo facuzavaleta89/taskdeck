@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   DndContext,
   DragOverlay,
@@ -37,7 +37,11 @@ export default function BoardView({ board, initialColumns, initialCards, initial
   const [savingColumn, setSavingColumn] = useState(false)
   const supabase = createClient()
 
-  // Support both mouse and touch (mobile)
+  // Sincronizar labels cuando el servidor refresca
+  useEffect(() => {
+    setLabels(initialLabels)
+  }, [initialLabels])
+
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
     useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 5 } }),
@@ -93,7 +97,6 @@ export default function BoardView({ board, initialColumns, initialCards, initial
       return [...otherCards, ...updates]
     })
 
-    // Batch update
     await Promise.all(
       updates.map(card =>
         supabase.from('cards').update({ position: card.position, column_id: card.column_id }).eq('id', card.id)
@@ -162,7 +165,6 @@ export default function BoardView({ board, initialColumns, initialCards, initial
 
   return (
     <div className="flex flex-col flex-1 overflow-hidden w-full">
-      {/* Toolbar - full viewport width */}
       <div className="px-4 sm:px-6 py-2 bg-black/10 flex items-center gap-2 flex-shrink-0 border-b border-[var(--color-border)]">
         <LabelsManager
           boardId={board.id}
@@ -171,7 +173,6 @@ export default function BoardView({ board, initialColumns, initialCards, initial
         />
       </div>
 
-      {/* Board columns area with horizontal scroll */}
       <div className="flex-1 overflow-hidden w-full">
         <div className="board-scroll p-4 sm:p-6 h-full w-full">
           <DndContext
@@ -195,7 +196,6 @@ export default function BoardView({ board, initialColumns, initialCards, initial
                 />
               ))}
 
-              {/* Add column */}
               <div className="flex-shrink-0 w-full sm:w-96 md:w-72">
                 {addingColumn ? (
                   <div className="bg-[var(--color-surface)] backdrop-blur-sm rounded-xl p-3 animate-scale-in border border-[var(--color-border)] shadow-sm">

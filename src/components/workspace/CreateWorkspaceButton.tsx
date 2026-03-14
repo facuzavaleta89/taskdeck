@@ -38,7 +38,7 @@ export default function CreateWorkspaceButton() {
       .single()
 
     if (wsError) {
-      setError(wsError.message.includes('unique') ? 'Ya existe un workspace con ese nombre.' : wsError.message)
+      setError(wsError.message.includes('unique') ? 'Ya tenés un workspace con ese nombre.' : wsError.message)
       setLoading(false)
       return
     }
@@ -88,12 +88,6 @@ export default function CreateWorkspaceButton() {
               autoFocus
               className="w-full px-4 py-2.5 bg-[var(--color-surface)] text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] border border-[var(--color-border)] rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--color-brand)] text-sm mb-1"
             />
-
-            {name && (
-              <p className="text-xs text-[var(--color-text-secondary)] mb-3 px-1">
-                URL: <span className="font-mono text-[var(--color-text-muted)]">/{slugify(name)}</span>
-              </p>
-            )}
 
             {error && <p className="text-red-500 text-sm mb-3">{error}</p>}
 
