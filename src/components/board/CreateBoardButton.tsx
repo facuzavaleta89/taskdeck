@@ -34,7 +34,7 @@ export default function CreateBoardButton({ workspaceId }: { workspaceId: string
       color,
     })
 
-    if (err) { setError(err.message); setLoading(false); return }
+    if (err) { setError(err.message.includes('unique') ? 'Ya existe un tablero con ese nombre en este workspace.' : err.message); setLoading(false); return }
 
     setOpen(false)
     setName('')

@@ -13,11 +13,11 @@ const COLORS = [
 
 interface Props {
   board: { id: string; name: string; color: string }
-  slug: string
+  workspaceId: string
   isOwner: boolean
 }
 
-export default function BoardCard({ board, slug, isOwner }: Props) {
+export default function BoardCard({ board, workspaceId, isOwner }: Props) {
   const [menuOpen,      setMenuOpen]      = useState(false)
   const [editOpen,      setEditOpen]      = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
@@ -46,7 +46,7 @@ export default function BoardCard({ board, slug, isOwner }: Props) {
       <div className="bg-[var(--color-surface)] rounded-2xl border border-[var(--color-border)] hover:border-[var(--color-brand)]/50 hover:shadow-lg transition-all duration-200 group">
 
         {/* Color banner */}
-        <Link href={`/workspace/${slug}/board/${board.id}`} className="block">
+        <Link href={`/workspace/${workspaceId}/board/${board.id}`} className="block">
           <div
             className="w-full h-24 hover:brightness-90 transition-all rounded-t-2xl"
             style={{ backgroundColor: color }}
@@ -54,7 +54,7 @@ export default function BoardCard({ board, slug, isOwner }: Props) {
         </Link>
 
         {/* Content */}
-        <Link href={`/workspace/${slug}/board/${board.id}`} className="block px-5 pt-4 pb-2">
+        <Link href={`/workspace/${workspaceId}/board/${board.id}`} className="block px-5 pt-4 pb-2">
           <h3 className="font-semibold text-[var(--color-text-primary)] text-sm truncate">{board.name}</h3>
           <p className="text-[var(--color-text-muted)] text-xs mt-0.5">Tablero</p>
         </Link>
@@ -96,7 +96,7 @@ export default function BoardCard({ board, slug, isOwner }: Props) {
             </>
           ) : (
             <Link
-              href={`/workspace/${slug}/board/${board.id}`}
+              href={`/workspace/${workspaceId}/board/${board.id}`}
               className="text-xs text-[var(--color-text-muted)] hover:text-[var(--color-brand)] transition-colors px-2 py-1 rounded-lg hover:bg-[var(--color-bg-secondary)]"
             >
               Abrir tablero →
@@ -110,14 +110,12 @@ export default function BoardCard({ board, slug, isOwner }: Props) {
         <Modal onClose={() => setEditOpen(false)} size="sm">
           <div className="p-6">
             <h3 className="text-base font-semibold text-[var(--color-text-primary)] mb-4">Editar tablero</h3>
-
             <div
               className="w-full h-16 rounded-xl mb-4 flex items-center px-4 text-white font-semibold text-sm"
               style={{ backgroundColor: color }}
             >
               {name || 'Vista previa'}
             </div>
-
             <div className="flex gap-2 mb-4 flex-wrap">
               {COLORS.map(c => (
                 <button
@@ -132,7 +130,6 @@ export default function BoardCard({ board, slug, isOwner }: Props) {
                 />
               ))}
             </div>
-
             <input
               type="text"
               value={name}
@@ -143,7 +140,6 @@ export default function BoardCard({ board, slug, isOwner }: Props) {
               placeholder="Máx. 20 caracteres"
               className="w-full px-4 py-2.5 border border-[var(--color-border)] rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--color-brand)] text-[var(--color-text-primary)] text-sm mb-4 bg-[var(--color-surface)]"
             />
-
             <div className="flex gap-3 justify-end">
               <button onClick={() => setEditOpen(false)} className="px-4 py-2 text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors">
                 Cancelar
