@@ -27,6 +27,7 @@ const ROLE_LABELS: Record<string, { label: string; color: string }> = {
 
 export default function MembersPanel({ members, currentUserId, isOwner, workspaceId }: Props) {
   const [confirmMember, setConfirmMember] = useState<Member | null>(null)
+  const [confirmLeave,  setConfirmLeave]  = useState(false)
   const [loading, setLoading] = useState(false)
   const supabase = createClient()
   const router   = useRouter()
@@ -41,6 +42,18 @@ export default function MembersPanel({ members, currentUserId, isOwner, workspac
     setLoading(false)
     setConfirmMember(null)
     router.refresh()
+  }
+
+  async function handleLeave() {
+    setLoading(true)
+    await supabase
+      .from('workspace_members')
+      .delete()
+      .eq('workspace_id', workspaceId)
+      .eq('user_id', currentUserId)
+    setLoading(false)
+    setConfirmLeave(false)
+    window.location.href = '/dashboard'
   }
 
   const initials = (name: string | null, email: string) =>
@@ -58,7 +71,8 @@ export default function MembersPanel({ members, currentUserId, isOwner, workspac
           {members.map((member, i) => {
             const roleInfo = ROLE_LABELS[member.role] ?? { label: member.role, color: 'bg-slate-100 text-slate-600' }
             const isCurrentUser = member.user_id === currentUserId
-            const canRemove = isOwner && !isCurrentUser && member.role !== 'owner'
+            const canRemove     = isOwner && !isCurrentUser && member.role !== 'owner'
+            const canLeave      = isCurrentUser && !isOwner
 
             return (
               <div
@@ -84,6 +98,15 @@ export default function MembersPanel({ members, currentUserId, isOwner, workspac
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
+                  {canLeave && (
+                    <button
+                      onClick={() => setConfirmLeave(true)}
+                      disabled={loading}
+                      className="text-xs text-[var(--color-text-muted)] hover:text-red-500 transition-colors px-2 py-1 rounded-lg hover:bg-red-500/10 disabled:opacity-50"
+                    >
+                      Salir del workspace
+                    </button>
+                  )}
                   <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${roleInfo.color}`}>
                     {roleInfo.label}
                   </span>
@@ -110,6 +133,17 @@ export default function MembersPanel({ members, currentUserId, isOwner, workspac
           danger
           onConfirm={() => handleRemove(confirmMember)}
           onCancel={() => setConfirmMember(null)}
+        />
+      )}
+
+      {confirmLeave && (
+        <ConfirmModal
+          title="¿Salir del workspace?"
+          message="Vas a dejar de tener acceso a este workspace."
+          confirmLabel="Salir"
+          danger
+          onConfirm={handleLeave}
+          onCancel={() => setConfirmLeave(false)}
         />
       )}
     </>
