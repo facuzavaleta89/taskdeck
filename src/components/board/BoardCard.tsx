@@ -56,6 +56,7 @@ export default function BoardCard({ board, workspaceId, isOwner, dragHandleProps
             {isOwner && Object.keys(dragHandleProps).length > 0 && (
               <div
                 {...dragHandleProps}
+                suppressHydrationWarning
                 onClick={e => e.preventDefault()}
                 className="absolute top-2 left-2 w-6 h-6 flex items-center justify-center rounded-md bg-black/20 hover:bg-black/40 text-white/80 hover:text-white opacity-0 group-hover:opacity-100 transition-all cursor-grab active:cursor-grabbing"
                 title="Arrastrar tablero"
