@@ -15,9 +15,10 @@ interface Props {
   board: { id: string; name: string; color: string }
   workspaceId: string
   isOwner: boolean
+  dragHandleProps?: Record<string, unknown>
 }
 
-export default function BoardCard({ board, workspaceId, isOwner }: Props) {
+export default function BoardCard({ board, workspaceId, isOwner, dragHandleProps = {} }: Props) {
   const [menuOpen,      setMenuOpen]      = useState(false)
   const [editOpen,      setEditOpen]      = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
@@ -45,12 +46,26 @@ export default function BoardCard({ board, workspaceId, isOwner }: Props) {
     <>
       <div className="bg-[var(--color-surface)] rounded-2xl border border-[var(--color-border)] hover:border-[var(--color-brand)]/50 hover:shadow-lg transition-all duration-200 group">
 
-        {/* Color banner */}
+        {/* Color banner — el handle de drag va aquí */}
         <Link href={`/workspace/${workspaceId}/board/${board.id}`} className="block">
           <div
-            className="w-full h-24 hover:brightness-90 transition-all rounded-t-2xl"
+            className="w-full h-24 hover:brightness-90 transition-all rounded-t-2xl relative"
             style={{ backgroundColor: color }}
-          />
+          >
+            {/* Grip handle — visible al hacer hover, solo si es owner */}
+            {isOwner && Object.keys(dragHandleProps).length > 0 && (
+              <div
+                {...dragHandleProps}
+                onClick={e => e.preventDefault()}
+                className="absolute top-2 left-2 w-6 h-6 flex items-center justify-center rounded-md bg-black/20 hover:bg-black/40 text-white/80 hover:text-white opacity-0 group-hover:opacity-100 transition-all cursor-grab active:cursor-grabbing"
+                title="Arrastrar tablero"
+              >
+                <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M7 4a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm0 4a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm0 4a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm6-8a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm0 4a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm0 4a1 1 0 1 1-2 0 1 1 0 0 1 2 0z" />
+                </svg>
+              </div>
+            )}
+          </div>
         </Link>
 
         {/* Content */}
