@@ -27,11 +27,21 @@ export default function CreateBoardButton({ workspaceId }: { workspaceId: string
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) { setError('Sin sesión activa.'); setLoading(false); return }
 
+    const { data: existingBoards } = await supabase
+  .from('boards')
+  .select('position')
+  .eq('workspace_id', workspaceId)
+  .order('position', { ascending: false })
+  .limit(1)
+
+    const nextPosition = ((existingBoards?.[0]?.position ?? 0) + 1000)
+
     const { error: err } = await supabase.from('boards').insert({
       name: name.trim(),
       workspace_id: workspaceId,
       created_by: user.id,
       color,
+      position: nextPosition,
     })
 
     if (err) { setError(err.message.includes('unique') ? 'Ya existe un tablero con ese nombre en este workspace.' : err.message); setLoading(false); return }

@@ -70,6 +70,9 @@ export default function BoardsGrid({ initialBoards, workspaceId, isOwner }: Prop
   const [activeBoard, setActiveBoard] = useState<Board | null>(null)
   const boardsRef = useRef(boards)
   useEffect(() => { boardsRef.current = boards }, [boards])
+  useEffect(() => {
+  setBoards([...initialBoards].sort((a, b) => a.position - b.position))
+    }, [initialBoards])
 
   const supabase = createClient()
 
