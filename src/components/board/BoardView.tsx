@@ -13,7 +13,7 @@ import {
   type DragOverEvent,
   type DragEndEvent,
 } from '@dnd-kit/core'
-import { SortableContext, arrayMove, horizontalListSortingStrategy } from '@dnd-kit/sortable'
+import { arrayMove } from '@dnd-kit/sortable'
 import { createClient } from '@/lib/supabase/client'
 import type { Board, Column, Card, Label } from '@/types'
 import ColumnComponent from './Column'
@@ -31,13 +31,13 @@ export default function BoardView({ board, initialColumns, initialCards, initial
   const [columns, setColumns] = useState<Column[]>(initialColumns)
   const [cards, setCards]     = useState<Card[]>(initialCards)
   const [labels, setLabels]   = useState<Label[]>(initialLabels)
-  const [activeCard,   setActiveCard]   = useState<Card | null>(null)
-  const [activeColumn, setActiveColumn] = useState<Column | null>(null)
+  const [activeCard, setActiveCard] = useState<Card | null>(null)
   const [addingColumn, setAddingColumn] = useState(false)
   const [newColumnName, setNewColumnName] = useState('')
   const [savingColumn, setSavingColumn] = useState(false)
   const supabase = createClient()
 
+  // Sincronizar labels cuando el servidor refresca
   useEffect(() => {
     setLabels(initialLabels)
   }, [initialLabels])
@@ -48,63 +48,33 @@ export default function BoardView({ board, initialColumns, initialCards, initial
   )
 
   function handleDragStart(event: DragStartEvent) {
-    const isColumn = event.active.data.current?.type === 'column'
-    if (isColumn) {
-      const col = columns.find(c => c.id === event.active.id)
-      if (col) setActiveColumn(col)
-    } else {
-      const card = cards.find(c => c.id === event.active.id)
-      if (card) setActiveCard(card)
-    }
+    const card = cards.find(c => c.id === event.active.id)
+    if (card) setActiveCard(card)
   }
 
   function handleDragOver(event: DragOverEvent) {
     const { active, over } = event
     if (!over) return
 
-    // Si estamos arrastrando una columna, no hacer nada aquí
-    if (active.data.current?.type === 'column') return
-
-    const activeCardData = cards.find(c => c.id === active.id)
-    if (!activeCardData) return
+    const activeCard = cards.find(c => c.id === active.id)
+    if (!activeCard) return
 
     const overCard   = cards.find(c => c.id === over.id)
     const overColumn = columns.find(c => c.id === over.id)
 
     const targetColumnId = overCard?.column_id ?? overColumn?.id
-    if (!targetColumnId || activeCardData.column_id === targetColumnId) return
+    if (!targetColumnId || activeCard.column_id === targetColumnId) return
 
     setCards(prev =>
-      prev.map(c => c.id === activeCardData.id ? { ...c, column_id: targetColumnId } : c)
+      prev.map(c => c.id === activeCard.id ? { ...c, column_id: targetColumnId } : c)
     )
   }
 
   async function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event
     setActiveCard(null)
-    setActiveColumn(null)
-    if (!over || active.id === over.id) return
+    if (!over) return
 
-    // ── Reordenar columnas ──────────────────────────────────
-    if (active.data.current?.type === 'column') {
-      const oldIndex = columns.findIndex(c => c.id === active.id)
-      const newIndex = columns.findIndex(c => c.id === over.id)
-      if (oldIndex === -1 || newIndex === -1) return
-
-      const reordered = arrayMove(columns, oldIndex, newIndex)
-        .map((col, i) => ({ ...col, position: (i + 1) * 1000 }))
-
-      setColumns(reordered)
-
-      await Promise.all(
-        reordered.map(col =>
-          supabase.from('columns').update({ position: col.position }).eq('id', col.id)
-        )
-      )
-      return
-    }
-
-    // ── Reordenar cards ─────────────────────────────────────
     const activeCardData = cards.find(c => c.id === active.id)
     if (!activeCardData) return
 
@@ -212,66 +182,64 @@ export default function BoardView({ board, initialColumns, initialCards, initial
             onDragOver={handleDragOver}
             onDragEnd={handleDragEnd}
           >
-            <SortableContext items={columns.map(c => c.id)} strategy={horizontalListSortingStrategy}>
-              <div className="flex gap-3 items-start h-full" style={{ minWidth: 'max-content' }}>
-                {columns.map(column => (
-                  <ColumnComponent
-                    key={column.id}
-                    column={column}
-                    cards={cards.filter(c => c.column_id === column.id).sort((a, b) => a.position - b.position)}
-                    labels={labels}
-                    onAddCard={handleAddCard}
-                    onUpdateCard={handleUpdateCard}
-                    onDeleteCard={handleDeleteCard}
-                    onDeleteColumn={handleDeleteColumn}
-                  />
-                ))}
+            <div className="flex gap-3 items-start h-full" style={{ minWidth: 'max-content' }}>
+              {columns.map(column => (
+                <ColumnComponent
+                  key={column.id}
+                  column={column}
+                  cards={cards.filter(c => c.column_id === column.id).sort((a, b) => a.position - b.position)}
+                  labels={labels}
+                  onAddCard={handleAddCard}
+                  onUpdateCard={handleUpdateCard}
+                  onDeleteCard={handleDeleteCard}
+                  onDeleteColumn={handleDeleteColumn}
+                />
+              ))}
 
-                <div className="flex-shrink-0 w-full sm:w-96 md:w-72">
-                  {addingColumn ? (
-                    <div className="bg-[var(--color-surface)] backdrop-blur-sm rounded-xl p-3 animate-scale-in border border-[var(--color-border)] shadow-sm">
-                      <input
-                        type="text"
-                        placeholder="Nombre de la lista..."
-                        value={newColumnName}
-                        onChange={e => setNewColumnName(e.target.value)}
-                        onKeyDown={e => {
-                          if (e.key === 'Enter') handleAddColumn()
-                          if (e.key === 'Escape') { setAddingColumn(false); setNewColumnName('') }
-                        }}
-                        autoFocus
-                        className="w-full px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-brand)] bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] mb-2 border border-[var(--color-border)]"
-                      />
-                      <div className="flex gap-2">
-                        <button
-                          onClick={handleAddColumn}
-                          disabled={savingColumn || !newColumnName.trim()}
-                          className="bg-[var(--color-brand)] text-white px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-[var(--color-brand-hover)] transition-colors disabled:opacity-50"
-                        >
-                          {savingColumn ? 'Agregando...' : 'Agregar lista'}
-                        </button>
-                        <button
-                          onClick={() => { setAddingColumn(false); setNewColumnName('') }}
-                          className="text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)] px-2 py-1.5 text-sm transition-colors"
-                        >
-                          Cancelar
-                        </button>
-                      </div>
+              <div className="flex-shrink-0 w-full sm:w-96 md:w-72">
+                {addingColumn ? (
+                  <div className="bg-[var(--color-surface)] backdrop-blur-sm rounded-xl p-3 animate-scale-in border border-[var(--color-border)] shadow-sm">
+                    <input
+                      type="text"
+                      placeholder="Nombre de la lista..."
+                      value={newColumnName}
+                      onChange={e => setNewColumnName(e.target.value)}
+                      onKeyDown={e => {
+                        if (e.key === 'Enter') handleAddColumn()
+                        if (e.key === 'Escape') { setAddingColumn(false); setNewColumnName('') }
+                      }}
+                      autoFocus
+                      className="w-full px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-brand)] bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] mb-2 border border-[var(--color-border)]"
+                    />
+                    <div className="flex gap-2">
+                      <button
+                        onClick={handleAddColumn}
+                        disabled={savingColumn || !newColumnName.trim()}
+                        className="bg-[var(--color-brand)] text-white px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-[var(--color-brand-hover)] transition-colors disabled:opacity-50"
+                      >
+                        {savingColumn ? 'Agregando...' : 'Agregar lista'}
+                      </button>
+                      <button
+                        onClick={() => { setAddingColumn(false); setNewColumnName('') }}
+                        className="text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)] px-2 py-1.5 text-sm transition-colors"
+                      >
+                        Cancelar
+                      </button>
                     </div>
-                  ) : (
-                    <button
-                      onClick={() => setAddingColumn(true)}
-                      className="w-full bg-[var(--color-bg-secondary)] hover:bg-[var(--color-border)] text-[var(--color-text-primary)] rounded-xl px-4 py-3 text-sm font-medium transition-all text-left flex items-center gap-2 hover:shadow-lg border border-[var(--color-border)]"
-                    >
-                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-                      </svg>
-                      Agregar lista
-                    </button>
-                  )}
-                </div>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setAddingColumn(true)}
+                    className="w-full bg-[var(--color-bg-secondary)] hover:bg-[var(--color-border)] text-[var(--color-text-primary)] rounded-xl px-4 py-3 text-sm font-medium transition-all text-left flex items-center gap-2 hover:shadow-lg border border-[var(--color-border)]"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                    </svg>
+                    Agregar lista
+                  </button>
+                )}
               </div>
-            </SortableContext>
+            </div>
 
             <DragOverlay>
               {activeCard && (
@@ -282,19 +250,6 @@ export default function BoardView({ board, initialColumns, initialCards, initial
                     onUpdate={handleUpdateCard}
                     onDelete={handleDeleteCard}
                     isDragging
-                  />
-                </div>
-              )}
-              {activeColumn && (
-                <div className="opacity-90 rotate-1 scale-105">
-                  <ColumnComponent
-                    column={activeColumn}
-                    cards={cards.filter(c => c.column_id === activeColumn.id).sort((a, b) => a.position - b.position)}
-                    labels={labels}
-                    onAddCard={handleAddCard}
-                    onUpdateCard={handleUpdateCard}
-                    onDeleteCard={handleDeleteCard}
-                    onDeleteColumn={handleDeleteColumn}
                   />
                 </div>
               )}
