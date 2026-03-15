@@ -49,6 +49,7 @@ export default function CardComponent({ card, labels, onUpdate, onDelete, isDrag
         style={style}
         {...attributes}
         {...listeners}
+        suppressHydrationWarning
         className={cn(
           'bg-[var(--color-surface)] rounded-xl p-3 border border-[var(--color-border)]',
           'cursor-grab active:cursor-grabbing select-none',

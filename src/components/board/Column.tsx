@@ -1,8 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
-import { useDroppable } from '@dnd-kit/core'
+import { SortableContext, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 import type { Column, Card, Label } from '@/types'
 import CardComponent from './Card'
 import { createClient } from '@/lib/supabase/client'
@@ -26,7 +26,20 @@ export default function ColumnComponent({ column, cards, labels, onAddCard, onUp
   const [confirmDelete, setConfirmDelete] = useState(false)
   const supabase = createClient()
 
-  const { setNodeRef, isOver } = useDroppable({ id: column.id })
+  const {
+    setNodeRef,
+    attributes,
+    listeners,
+    transform,
+    transition,
+    isDragging,
+    isOver,
+  } = useSortable({ id: column.id, data: { type: 'column' } })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  }
 
   async function handleSaveName() {
     if (!columnName.trim()) { setColumnName(column.name); setEditingName(false); return }
@@ -43,15 +56,38 @@ export default function ColumnComponent({ column, cards, labels, onAddCard, onUp
 
   return (
     <>
-      <div className={`
-        flex-shrink-0 w-72 flex flex-col rounded-2xl
-        bg-[var(--color-bg-secondary)] border border-[var(--color-border)]
-        shadow-sm transition-all duration-150
-        ${isOver ? 'ring-2 ring-[var(--color-brand)]/50 scale-[1.01]' : ''}
-      `}>
-
+      <div
+        ref={setNodeRef}
+        style={style}
+        suppressHydrationWarning
+        className={`
+          flex-shrink-0 w-72 flex flex-col rounded-2xl
+          bg-[var(--color-bg-secondary)] border border-[var(--color-border)]
+          shadow-sm transition-all duration-150
+          ${isDragging ? 'opacity-50 scale-95' : ''}
+          ${isOver && !isDragging ? 'ring-2 ring-[var(--color-brand)]/50 scale-[1.01]' : ''}
+        `}
+      >
         {/* Column header */}
         <div className="px-3 pt-3 pb-2 flex items-center gap-1">
+
+          {/* Drag handle */}
+          <button
+            {...attributes}
+            {...listeners}
+            className="w-6 h-6 flex items-center justify-center rounded-md text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)] hover:bg-[var(--color-border)] transition-colors cursor-grab active:cursor-grabbing flex-shrink-0"
+            title="Arrastrar columna"
+          >
+            <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+              <circle cx="9"  cy="5"  r="1.5" />
+              <circle cx="15" cy="5"  r="1.5" />
+              <circle cx="9"  cy="12" r="1.5" />
+              <circle cx="15" cy="12" r="1.5" />
+              <circle cx="9"  cy="19" r="1.5" />
+              <circle cx="15" cy="19" r="1.5" />
+            </svg>
+          </button>
+
           {editingName ? (
             <input
               value={columnName}
@@ -89,10 +125,7 @@ export default function ColumnComponent({ column, cards, labels, onAddCard, onUp
         </div>
 
         {/* Cards area */}
-        <div
-          ref={setNodeRef}
-          className="flex-1 overflow-y-auto px-2 pb-2 space-y-2 min-h-[40px]"
-        >
+        <div className="flex-1 overflow-y-auto px-2 pb-2 space-y-2 min-h-[40px]">
           <SortableContext items={cards.map(c => c.id)} strategy={verticalListSortingStrategy}>
             {cards.map(card => (
               <CardComponent
