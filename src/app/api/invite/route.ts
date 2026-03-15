@@ -18,6 +18,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Faltan datos' }, { status: 400 })
   }
 
+  // Verificar que el usuario logueado sea owner del workspace
   const { data: workspace } = await supabase
     .from('workspaces')
     .select('id, name, slug')
@@ -29,6 +30,50 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'No tenés permiso para invitar a este workspace' }, { status: 403 })
   }
 
+  const normalizedEmail = email.trim().toLowerCase()
+
+  // Buscar si el email corresponde a un usuario registrado
+  const { data: existingUser } = await supabase.rpc('find_user_by_email', {
+    search_email: normalizedEmail,
+  })
+
+  const foundUser = existingUser && existingUser.length > 0 ? existingUser[0] : null
+
+  // Check 1: si el usuario existe, verificar que no sea ya miembro del workspace
+  if (foundUser) {
+    const { data: membership } = await supabase
+      .from('workspace_members')
+      .select('user_id')
+      .eq('workspace_id', workspaceId)
+      .eq('user_id', foundUser.id)
+      .single()
+
+    if (membership) {
+      return NextResponse.json(
+        { error: 'Este usuario ya es miembro del workspace' },
+        { status: 409 }
+      )
+    }
+  }
+
+  // Check 2: verificar que no exista una invitación pendiente para este email
+  const { data: pendingInvite } = await supabase
+    .from('invitations')
+    .select('id')
+    .eq('workspace_id', workspaceId)
+    .eq('email', normalizedEmail)
+    .eq('accepted', false)
+    .gt('expires_at', new Date().toISOString())
+    .single()
+
+  if (pendingInvite) {
+    return NextResponse.json(
+      { error: 'Ya existe una invitación pendiente para este email' },
+      { status: 409 }
+    )
+  }
+
+  // Todos los checks pasaron → insertar la invitación
   const token = crypto.randomUUID()
   const expiresAt = new Date()
   expiresAt.setDate(expiresAt.getDate() + 7)
@@ -37,27 +82,24 @@ export async function POST(req: Request) {
     .from('invitations')
     .insert({
       workspace_id: workspaceId,
-      email: email.trim().toLowerCase(),
+      email:        normalizedEmail,
       token,
-      expires_at: expiresAt.toISOString(),
-      accepted: false,
-      invited_by: user.id,
+      expires_at:   expiresAt.toISOString(),
+      accepted:     false,
+      invited_by:   user.id,
     })
 
   if (dbError) {
     return NextResponse.json({ error: dbError.message }, { status: 500 })
   }
 
-  const { data: existingUser } = await supabase.rpc('find_user_by_email', {
-    search_email: email.trim().toLowerCase()
-  })
-
-  if (!existingUser || existingUser.length === 0) {
+  // Si el usuario NO está registrado, enviarle el email con el link
+  if (!foundUser) {
     const inviteUrl = `${process.env.NEXT_PUBLIC_APP_URL}/invite/${token}`
 
     const { error: emailError } = await resend.emails.send({
-      from: 'TaskDeck <onboarding@resend.dev>',
-      to: email,
+      from:    'TaskDeck <onboarding@resend.dev>',
+      to:      normalizedEmail,
       subject: `Te invitaron a unirte a ${workspaceName} en TaskDeck`,
       html: `
         <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
