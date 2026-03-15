@@ -19,12 +19,13 @@ export default function CardModal({ card, labels, onUpdate, onDelete, onClose }:
   const [description, setDescription] = useState(card.description ?? '')
   const [dueDate, setDueDate]         = useState(card.due_date ?? '')
   const [saving, setSaving]           = useState(false)
+  const [activeLabels, setActiveLabels] = useState<CardLabel[]>(card.labels ?? [])
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [checklistItems, setChecklistItems] = useState<ChecklistItem[]>(
     (card.checklist_items ?? []).sort((a, b) => a.position - b.position)
   )
-  const [newItemText, setNewItemText]   = useState('')
-  const [addingItem, setAddingItem]     = useState(false)
+  const [newItemText, setNewItemText] = useState('')
+  const [addingItem, setAddingItem]   = useState(false)
   const supabase = createClient()
 
   const completedCount = checklistItems.filter(i => i.completed).length
@@ -66,28 +67,49 @@ export default function CardModal({ card, labels, onUpdate, onDelete, onClose }:
   async function handleSave() {
     if (!title.trim()) return
     setSaving(true)
-    const updated = { ...card, title: title.trim(), description: description || null, due_date: dueDate || null }
+
+    // Guardar campos de la card
     await supabase.from('cards').update({
-      title: updated.title,
-      description: updated.description,
-      due_date: updated.due_date,
+      title:       title.trim(),
+      description: description || null,
+      due_date:    dueDate || null,
     }).eq('id', card.id)
+
+    // Sincronizar etiquetas: comparar estado actual vs original
+    const originalLabelIds = (card.labels ?? []).map(cl => cl.label_id)
+    const activeLabelIds   = activeLabels.map(cl => cl.label_id)
+
+    const toDelete = originalLabelIds.filter(id => !activeLabelIds.includes(id))
+    const toInsert = activeLabelIds.filter(id => !originalLabelIds.includes(id))
+
+    await Promise.all([
+      ...toDelete.map(labelId =>
+        supabase.from('card_labels').delete().eq('card_id', card.id).eq('label_id', labelId)
+      ),
+      ...toInsert.map(labelId =>
+        supabase.from('card_labels').insert({ card_id: card.id, label_id: labelId })
+      ),
+    ])
+
+    const updated = {
+      ...card,
+      title:       title.trim(),
+      description: description || null,
+      due_date:    dueDate || null,
+      labels:      activeLabels,
+    }
     onUpdate(updated)
     setSaving(false)
     onClose()
   }
 
-  async function handleToggleLabel(labelId: string) {
-    const currentLabels: CardLabel[] = card.labels ?? []
-    const hasLabel = currentLabels.some(cl => cl.label_id === labelId)
-
+  function handleToggleLabel(labelId: string) {
+    const hasLabel = activeLabels.some(cl => cl.label_id === labelId)
     if (hasLabel) {
-      await supabase.from('card_labels').delete().eq('card_id', card.id).eq('label_id', labelId)
-      onUpdate({ ...card, labels: currentLabels.filter(cl => cl.label_id !== labelId) })
+      setActiveLabels(prev => prev.filter(cl => cl.label_id !== labelId))
     } else {
-      const { data: label } = await supabase.from('labels').select('*').eq('id', labelId).single()
-      await supabase.from('card_labels').insert({ card_id: card.id, label_id: labelId })
-      onUpdate({ ...card, labels: [...currentLabels, { label_id: labelId, labels: label }] })
+      const label = labels.find(l => l.id === labelId) ?? null
+      setActiveLabels(prev => [...prev, { label_id: labelId, labels: label }])
     }
   }
 
@@ -140,7 +162,7 @@ export default function CardModal({ card, labels, onUpdate, onDelete, onClose }:
             <Field label="Etiquetas">
               <div className="flex gap-2 flex-wrap">
                 {labels.map(label => {
-                  const isActive = card.labels?.some(cl => cl.label_id === label.id)
+                  const isActive = activeLabels.some(cl => cl.label_id === label.id)
                   return (
                     <button
                       key={label.id}
@@ -156,6 +178,7 @@ export default function CardModal({ card, labels, onUpdate, onDelete, onClose }:
                   )
                 })}
               </div>
+
             </Field>
           )}
 
