@@ -8,16 +8,16 @@
   --color-brand-light: #eff6ff;
 
   /* Neutral palette */
-  --color-bg:          #ffffff;
-  --color-bg-secondary: #f5f7fa;
-  --color-surface:     #ffffff;
-  --color-border:      #d9dcde;
-  --color-border-soft: #e8eaed;
+  --color-bg:           #f0f2f5;
+  --color-bg-secondary: #e6e9ee;
+  --color-surface:      #f7f8fa;
+  --color-border:       #d0d4da;
+  --color-border-soft:  #dde0e5;
 
   /* Text */
-  --color-text-primary:   #0f172a;
-  --color-text-secondary: #475569;
-  --color-text-muted:     #94a3b8;
+  --color-text-primary:   #1e2a3a;
+  --color-text-secondary: #4a5568;
+  --color-text-muted:     #8896a5;
 
   /* Danger */
   --color-danger:       #ef4444;
