@@ -18,7 +18,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Faltan datos' }, { status: 400 })
   }
 
-  // Verificar que el usuario es dueño del workspace
   const { data: workspace } = await supabase
     .from('workspaces')
     .select('id, name, slug')
@@ -30,28 +29,10 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'No tenés permiso para invitar a este workspace' }, { status: 403 })
   }
 
-  // Verificar si ya existe una invitación pendiente
-  const { data: existing } = await supabase
-    .from('invitations')
-    .select('id')
-    .eq('workspace_id', workspaceId)
-    .eq('email', email.trim().toLowerCase())
-    .eq('accepted', false)
-    .single()
-
-  if (existing) {
-    return NextResponse.json(
-      { error: 'Ya existe una invitación pendiente para este email.' },
-      { status: 400 }
-    )
-  }
-
-  // Generar token y fecha de expiración
   const token = crypto.randomUUID()
   const expiresAt = new Date()
   expiresAt.setDate(expiresAt.getDate() + 7)
 
-  // Guardar invitación en la DB
   const { error: dbError } = await supabase
     .from('invitations')
     .insert({
@@ -67,7 +48,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: dbError.message }, { status: 500 })
   }
 
-  // Solo enviar email si el usuario NO está registrado en la app
   const { data: existingUser } = await supabase.rpc('find_user_by_email', {
     search_email: email.trim().toLowerCase()
   })
