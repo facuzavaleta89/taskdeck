@@ -60,6 +60,7 @@ export function Breadcrumbs() {
           ) : (
             <Link
               href={crumb.href}
+              prefetch={false}
               className="text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"
             >
               {crumb.label}

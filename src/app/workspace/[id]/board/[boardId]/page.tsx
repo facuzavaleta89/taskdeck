@@ -2,19 +2,20 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect, notFound } from 'next/navigation'
 import BoardView from '@/components/board/BoardView'
 import { BoardNameSetter } from '@/components/board/BoardNameSetter'
+import { WorkspaceNameSetter } from '@/components/workspace/WorkspaceNameSetter'
 import type { Metadata } from 'next'
 
 export const dynamic = 'force-dynamic'
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string; boardId: string }> }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ id: string; boardId: string }> }): Promise<Metadata> {
   const supabase = await createClient()
   const { boardId } = await params
   const { data: board } = await supabase.from('boards').select('name').eq('id', boardId).single()
   return { title: board?.name ?? 'Tablero' }
 }
 
-export default async function BoardPage({ params }: { params: Promise<{ slug: string; boardId: string }> }) {
-  const { slug, boardId } = await params
+export default async function BoardPage({ params }: { params: Promise<{ id: string; boardId: string }> }) {
+  const { id, boardId } = await params
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
@@ -26,6 +27,12 @@ export default async function BoardPage({ params }: { params: Promise<{ slug: st
     .single()
 
   if (!board) notFound()
+
+  const { data: workspace } = await supabase
+    .from('workspaces')
+    .select('name')
+    .eq('id', board.workspace_id)
+    .single()
 
   const { data: membership } = await supabase
     .from('workspace_members')
@@ -56,6 +63,7 @@ export default async function BoardPage({ params }: { params: Promise<{ slug: st
   return (
     <div className="h-[calc(100vh-3.5rem)] flex flex-col" style={{ backgroundColor: board.color }}>
       <BoardNameSetter boardName={board.name} />
+      <WorkspaceNameSetter workspaceName={workspace?.name ?? ''} />
       <BoardView
         board={board}
         initialColumns={columns ?? []}

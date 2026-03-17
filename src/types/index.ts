@@ -26,6 +26,7 @@ export type Board = {
   created_by: string
   color: string
   created_at: string
+  position: number
 }
 
 export type Column = {

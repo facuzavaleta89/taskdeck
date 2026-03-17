@@ -27,7 +27,7 @@ export default function CardComponent({ card, labels, onUpdate, onDelete, isDrag
     transform,
     transition,
     isDragging: isSortableDragging,
-  } = useSortable({ id: card.id })
+  } = useSortable({ id: card.id, data: { type: 'card' } })
 
   const style = {
     transform: CSS.Transform.toString(transform),

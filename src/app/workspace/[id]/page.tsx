@@ -2,10 +2,12 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect, notFound } from 'next/navigation'
 import CreateBoardButton from '@/components/board/CreateBoardButton'
 import InviteMemberButton from '@/components/workspace/InviteMemberButton'
-import BoardCard from '@/components/board/BoardCard'
+import BoardsGrid from '@/components/board/BoardsGrid'
 import MembersPanel from '@/components/workspace/MembersPanel'
 import { WorkspaceNameSetter } from '@/components/workspace/WorkspaceNameSetter'
 import type { Metadata } from 'next'
+
+export const dynamic = 'force-dynamic'
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params
@@ -39,9 +41,8 @@ export default async function WorkspacePage({ params }: { params: Promise<{ id: 
     .from('boards')
     .select('*')
     .eq('workspace_id', workspace.id)
-    .order('created_at')
+    .order('position')   // ← ordenar por position en lugar de created_at
 
-  // Traer miembros con sus perfiles
   const { data: memberships } = await supabase
     .from('workspace_members')
     .select('user_id, role')
@@ -79,24 +80,12 @@ export default async function WorkspacePage({ params }: { params: Promise<{ id: 
         </div>
       </div>
 
-      {/* Boards */}
-      {!boards || boards.length === 0 ? (
-        <div className="text-center py-24 sm:py-32 animate-fade-in">
-          <div className="w-16 h-16 bg-[var(--color-bg-secondary)] rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-[var(--color-text-muted)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-            </svg>
-          </div>
-          <p className="text-[var(--color-text-primary)] font-semibold mb-1">Sin tableros todavía</p>
-          <p className="text-[var(--color-text-secondary)] text-sm">Aún no has creado ningún tablero en este workspace.</p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5 animate-fade-in">
-          {boards.map(board => (
-            <BoardCard key={board.id} board={board} workspaceId={workspace.id} isOwner={isOwner} />
-          ))}
-        </div>
-      )}
+      {/* Boards con DnD */}
+      <BoardsGrid
+        initialBoards={boards ?? []}
+        workspaceId={workspace.id}
+        isOwner={isOwner}
+      />
 
       {/* Miembros */}
       <MembersPanel

@@ -4,7 +4,6 @@ import { NextResponse, type NextRequest } from 'next/server'
 export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
 
-  // No hacer getUser en rutas API para evitar rate limit
   if (request.nextUrl.pathname.startsWith('/api/')) {
     return supabaseResponse
   }
@@ -30,7 +29,11 @@ export async function proxy(request: NextRequest) {
     }
   )
 
+  await supabase.auth.getUser()
+
   const { data: { user } } = await supabase.auth.getUser()
+
+  console.log('PROXY:', request.nextUrl.pathname, '| user:', user?.id ?? 'NULL', '| cookies:', request.cookies.getAll().map(c => c.name))
 
   const isProtectedRoute =
     request.nextUrl.pathname.startsWith('/dashboard') ||
