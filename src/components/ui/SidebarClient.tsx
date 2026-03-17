@@ -103,6 +103,7 @@ export function SidebarClient({ displayName, email, initials, notificationCount 
             <Link
               key={item.href}
               href={item.href}
+              prefetch={false}
               onClick={() => setIsOpen(false)}
               className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-150 ${
                 isOpen ? 'w-full' : 'w-10 justify-center'
