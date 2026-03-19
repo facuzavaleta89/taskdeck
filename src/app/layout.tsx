@@ -31,7 +31,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ThemeProvider>
           <NavigationProvider>
             <Navbar />
-            <div className="flex flex-1 overflow-hidden">
+            <div className="flex flex-1">
               <Sidebar />
               <div className="flex-1 flex flex-col overflow-hidden">
                 {children}

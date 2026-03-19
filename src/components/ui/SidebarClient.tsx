@@ -46,9 +46,8 @@ export function SidebarClient({ displayName, email, initials, notificationCount 
         <div className="fixed inset-0 bg-black/30 z-30 lg:hidden" onClick={() => setIsOpen(false)} />
       )}
 
-      {/* Sidebar */}
       <aside
-        className={`fixed md:relative left-0 top-0 h-screen bg-[var(--color-surface)] border-r border-[var(--color-border)] z-40 flex flex-col transform transition-all duration-300 ease-out ${
+        className={`fixed md:sticky md:top-14 left-0 top-0 h-[100dvh] md:h-[calc(100dvh-3.5rem)] bg-[var(--color-surface)] border-r border-[var(--color-border)] z-40 flex flex-col transform transition-all duration-300 ease-out ${
           isOpen ? 'w-64 translate-x-0' : 'w-16 -translate-x-full md:translate-x-0'
         }`}
       >
