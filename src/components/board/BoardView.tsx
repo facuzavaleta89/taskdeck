@@ -284,7 +284,7 @@ export default function BoardView({ board, initialColumns, initialCards, initial
                   />
                 ))}
 
-                <div className="flex-shrink-0 w-full sm:w-96 md:w-72">
+                <div className="flex-shrink-0 w-72">
                   {addingColumn ? (
                     <div className="bg-[var(--color-surface)] backdrop-blur-sm rounded-xl p-3 animate-scale-in border border-[var(--color-border)] shadow-sm">
                       <input

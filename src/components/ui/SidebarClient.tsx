@@ -39,15 +39,16 @@ export function SidebarClient({ displayName, email, initials, notificationCount 
 
   return (
     <>
-      {/* Mobile hamburger */}
+      {/* Mobile toggle (when closed) */}
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="fixed left-4 top-16 z-40 md:hidden bg-[var(--color-surface)] border border-[var(--color-border)] w-10 h-10 rounded-lg flex items-center justify-center hover:bg-[var(--color-bg-secondary)] transition-all shadow-md"
+          className="md:hidden fixed left-0 top-1/2 z-50 bg-[var(--color-surface)] border border-[var(--color-border)] border-l-0 w-7 h-10 rounded-r-full flex items-center justify-center hover:bg-[var(--color-bg-secondary)] transition-all shadow-md"
+          style={{ transform: 'translateY(-50%)' }}
           title="Abrir menú"
         >
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+          <svg className="w-3.5 h-3.5 text-[var(--color-text-muted)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
           </svg>
         </button>
       )}
