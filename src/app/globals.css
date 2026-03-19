@@ -111,6 +111,23 @@ input::placeholder {
   color: var(--color-text-muted);
 }
 
+/* ─── Webkit Autofill fix ──────────────────────────────── */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px #d1fae5 inset !important; /* emerald-100 */
+  -webkit-text-fill-color: var(--color-text-primary) !important;
+}
+
+[data-theme="dark"] input:-webkit-autofill,
+[data-theme="dark"] input:-webkit-autofill:hover, 
+[data-theme="dark"] input:-webkit-autofill:focus, 
+[data-theme="dark"] input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px #022c22 inset !important; /* emerald-950 */
+  -webkit-text-fill-color: var(--color-text-primary) !important;
+}
+
 /* ─── Custom scrollbar ────────────────────────────────────── */
 ::-webkit-scrollbar {
   width: 6px;

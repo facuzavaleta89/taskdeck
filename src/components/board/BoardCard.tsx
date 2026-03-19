@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
@@ -26,7 +26,7 @@ export default function BoardCard({ board, workspaceId, isOwner, dragHandleProps
   const [color,   setColor]   = useState(board.color)
   const [loading, setLoading] = useState(false)
   const router   = useRouter()
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
 
   async function handleSave() {
     if (!name.trim()) return
@@ -39,7 +39,7 @@ export default function BoardCard({ board, workspaceId, isOwner, dragHandleProps
 
   async function handleDelete() {
     await supabase.from('boards').delete().eq('id', board.id)
-    router.refresh()
+    router.refresh() // Necesario: el tablero debe desaparecer del grid
   }
 
   return (

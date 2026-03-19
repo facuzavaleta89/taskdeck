@@ -107,9 +107,6 @@ export default function MembersPanel({ members, currentUserId, isOwner, workspac
                       Salir del workspace
                     </button>
                   )}
-                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${roleInfo.color}`}>
-                    {roleInfo.label}
-                  </span>
                   {canRemove && (
                     <button
                       onClick={() => setConfirmMember(member)}
@@ -118,6 +115,9 @@ export default function MembersPanel({ members, currentUserId, isOwner, workspac
                       Eliminar
                     </button>
                   )}
+                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${roleInfo.color}`}>
+                    {roleInfo.label}
+                  </span>
                 </div>
               </div>
             )

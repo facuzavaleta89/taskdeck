@@ -1,8 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { useRouter } from 'next/navigation'
 import type { Label } from '@/types'
 import { Modal, ConfirmModal } from '@/components/ui/Modal'
 
@@ -17,86 +16,15 @@ interface Props {
   onLabelsChange: (labels: Label[]) => void
 }
 
-export default function LabelsManager({ boardId, initialLabels, onLabelsChange }: Props) {
-  const [open, setOpen]         = useState(false)
-  const [labels, setLabels]     = useState<Label[]>(initialLabels)
-  const [creating, setCreating] = useState(false)
-  const [newName, setNewName]   = useState('')
-  const [newColor, setNewColor] = useState(PRESET_COLORS[0])
+// ColorPicker definido top-level para evitar desmontajes/remontajes en cada render del padre
+interface ColorPickerProps {
+  selectedColor: string
+  onChange: (color: string) => void
+  usedColors: string[]
+}
 
-  const [editingId, setEditingId] = useState<string | null>(null)
-  const [editName, setEditName]   = useState('')
-  const [editColor, setEditColor] = useState('')
-
-  const [confirmDelete, setConfirmDelete] = useState<Label | null>(null)
-  const supabase = createClient()
-  const router   = useRouter()
-
-  useEffect(() => {
-    setLabels(initialLabels)
-  }, [initialLabels])
-
-  const usedColors       = labels.filter(l => l.id !== editingId).map(l => l.color)
-  const usedColorsForNew = labels.map(l => l.color)
-
-  async function handleCreate() {
-    if (!newName.trim()) return
-    const { data } = await supabase.from('labels').insert({
-      name: newName.trim(),
-      color: newColor,
-      board_id: boardId,
-    }).select().single()
-
-    if (data) {
-      const updated = [...labels, data]
-      setLabels(updated)
-      onLabelsChange(updated)
-      setNewName('')
-      const nextColor = PRESET_COLORS.find(c => !updated.map(l => l.color).includes(c)) ?? PRESET_COLORS[0]
-      setNewColor(nextColor)
-      setCreating(false)
-      setOpen(false)
-      router.refresh()
-    }
-  }
-
-  async function handleSaveEdit(id: string) {
-    await supabase.from('labels').update({ name: editName, color: editColor }).eq('id', id)
-    const updated = labels.map(l => l.id === id ? { ...l, name: editName, color: editColor } : l)
-    setLabels(updated)
-    onLabelsChange(updated)
-    setEditingId(null)
-    setOpen(false)
-    router.refresh()
-  }
-
-  async function handleDelete(label: Label) {
-    await supabase.from('labels').delete().eq('id', label.id)
-    const updated = labels.filter(l => l.id !== label.id)
-    setLabels(updated)
-    onLabelsChange(updated)
-    setConfirmDelete(null)
-    setOpen(false)
-    router.refresh()
-  }
-
-  function startEdit(label: Label) {
-    setEditingId(label.id)
-    setEditName(label.name ?? '')
-    setEditColor(label.color)
-  }
-
-  function handleOpen() {
-    const nextColor = PRESET_COLORS.find(c => !labels.map(l => l.color).includes(c)) ?? PRESET_COLORS[0]
-    setNewColor(nextColor)
-    setOpen(true)
-  }
-
-  const ColorPicker = ({ selectedColor, onChange, usedColors }: {
-    selectedColor: string
-    onChange: (color: string) => void
-    usedColors: string[]
-  }) => (
+function ColorPicker({ selectedColor, onChange, usedColors }: ColorPickerProps) {
+  return (
     <div className="flex gap-2 flex-wrap">
       {PRESET_COLORS.map(c => {
         const isUsed     = usedColors.includes(c)
@@ -128,6 +56,81 @@ export default function LabelsManager({ boardId, initialLabels, onLabelsChange }
       })}
     </div>
   )
+}
+
+export default function LabelsManager({ boardId, initialLabels, onLabelsChange }: Props) {
+  const [open, setOpen]         = useState(false)
+  const [labels, setLabels]     = useState<Label[]>(initialLabels)
+  const [creating, setCreating] = useState(false)
+  const [newName, setNewName]   = useState('')
+  const [newColor, setNewColor] = useState(PRESET_COLORS[0])
+
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editName, setEditName]   = useState('')
+  const [editColor, setEditColor] = useState('')
+
+  const [confirmDelete, setConfirmDelete] = useState<Label | null>(null)
+  const supabase = useMemo(() => createClient(), [])
+
+  useEffect(() => {
+    setLabels(initialLabels)
+  }, [initialLabels])
+
+  const usedColors       = labels.filter(l => l.id !== editingId).map(l => l.color)
+  const usedColorsForNew = labels.map(l => l.color)
+
+  async function handleCreate() {
+    if (!newName.trim()) return
+    const { data } = await supabase.from('labels').insert({
+      name: newName.trim(),
+      color: newColor,
+      board_id: boardId,
+    }).select().single()
+
+    if (data) {
+      const updated = [...labels, data]
+      setLabels(updated)
+      onLabelsChange(updated)
+      setNewName('')
+      const nextColor = PRESET_COLORS.find(c => !updated.map(l => l.color).includes(c)) ?? PRESET_COLORS[0]
+      setNewColor(nextColor)
+      setCreating(false)
+      setOpen(false)
+      // router.refresh() eliminado: onLabelsChange ya sincroniza el estado local
+    }
+  }
+
+  async function handleSaveEdit(id: string) {
+    await supabase.from('labels').update({ name: editName, color: editColor }).eq('id', id)
+    const updated = labels.map(l => l.id === id ? { ...l, name: editName, color: editColor } : l)
+    setLabels(updated)
+    onLabelsChange(updated)
+    setEditingId(null)
+    setOpen(false)
+    // router.refresh() eliminado: onLabelsChange ya sincroniza el estado local
+  }
+
+  async function handleDelete(label: Label) {
+    await supabase.from('labels').delete().eq('id', label.id)
+    const updated = labels.filter(l => l.id !== label.id)
+    setLabels(updated)
+    onLabelsChange(updated)
+    setConfirmDelete(null)
+    setOpen(false)
+    // router.refresh() eliminado: onLabelsChange ya sincroniza el estado local
+  }
+
+  function startEdit(label: Label) {
+    setEditingId(label.id)
+    setEditName(label.name ?? '')
+    setEditColor(label.color)
+  }
+
+  function handleOpen() {
+    const nextColor = PRESET_COLORS.find(c => !labels.map(l => l.color).includes(c)) ?? PRESET_COLORS[0]
+    setNewColor(nextColor)
+    setOpen(true)
+  }
 
   return (
     <>

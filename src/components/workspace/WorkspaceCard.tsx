@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
@@ -18,24 +18,25 @@ interface Props {
   ownerName?: string | null
 }
 
+// Usando clases con opacidad baja para que funcionen en dark y light mode
 const ROLE_LABELS: Record<string, { label: string; color: string }> = {
-  owner:  { label: 'Propietario', color: 'bg-violet-100 text-violet-700' },
-  admin:  { label: 'Admin',       color: 'bg-blue-100 text-blue-700' },
-  member: { label: 'Miembro',     color: 'bg-slate-100 text-slate-600' },
+  owner: { label: 'Propietario', color: 'bg-violet-500/15 text-violet-400' },
+  admin: { label: 'Admin', color: 'bg-[var(--color-brand)]/15 text-[var(--color-brand)]' },
+  member: { label: 'Miembro', color: 'bg-[var(--color-bg-secondary)] text-[var(--color-text-secondary)]' },
 }
 
 const BG_COLORS = ['bg-blue-500', 'bg-violet-500', 'bg-emerald-500', 'bg-orange-500', 'bg-rose-500', 'bg-cyan-500']
 
 export default function WorkspaceCard({ workspace, currentUserId, ownerName }: Props) {
-  const [menuOpen,      setMenuOpen]      = useState(false)
-  const [editOpen,      setEditOpen]      = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [editOpen, setEditOpen] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
-  const [confirmLeave,  setConfirmLeave]  = useState(false)
-  const [name,    setName]    = useState(workspace.name)
+  const [confirmLeave, setConfirmLeave] = useState(false)
+  const [name, setName] = useState(workspace.name)
   const [loading, setLoading] = useState(false)
-  const isOwner  = workspace.owner_id === currentUserId
-  const router   = useRouter()
-  const supabase = createClient()
+  const isOwner = workspace.owner_id === currentUserId
+  const router = useRouter()
+  const supabase = useMemo(() => createClient(), [])
 
   async function handleRename() {
     if (!name.trim()) return
@@ -48,7 +49,7 @@ export default function WorkspaceCard({ workspace, currentUserId, ownerName }: P
 
   async function handleDelete() {
     await supabase.from('workspaces').delete().eq('id', workspace.id)
-    router.refresh()
+    router.refresh() // Necesario: el workspace debe desaparecer del dashboard
   }
 
   async function handleLeave() {
@@ -57,11 +58,11 @@ export default function WorkspaceCard({ workspace, currentUserId, ownerName }: P
       .delete()
       .eq('workspace_id', workspace.id)
       .eq('user_id', currentUserId)
-    router.refresh()
+    router.refresh() // Necesario: el workspace compartido debe desaparecer
   }
 
-  const letter   = workspace.name[0]?.toUpperCase() ?? '?'
-  const bgColor  = BG_COLORS[workspace.name.charCodeAt(0) % BG_COLORS.length]
+  const letter = workspace.name[0]?.toUpperCase() ?? '?'
+  const bgColor = BG_COLORS[workspace.name.charCodeAt(0) % BG_COLORS.length]
   const roleInfo = ROLE_LABELS[workspace.role] ?? { label: workspace.role, color: 'bg-[var(--color-bg-secondary)] text-[var(--color-text-secondary)]' }
 
   return (
@@ -74,7 +75,7 @@ export default function WorkspaceCard({ workspace, currentUserId, ownerName }: P
             </div>
             <div className="flex-1 min-w-0">
               <h3 className="font-semibold text-[var(--color-text-primary)] text-sm truncate">{workspace.name}</h3>
-              <p className="text-[var(--color-text-muted)] text-xs mt-0.5 font-mono">/{workspace.slug}</p>
+              <p className="text-[var(--color-text-muted)] text-xs mt-0.5 font-mono">/{workspace.id}</p>
               {!isOwner && ownerName && (
                 <p className="text-[var(--color-text-muted)] text-xs mt-0.5">
                   De <span className="text-[var(--color-text-secondary)]">{ownerName}</span>
@@ -109,7 +110,7 @@ export default function WorkspaceCard({ workspace, currentUserId, ownerName }: P
                       onClick={e => { e.preventDefault(); setEditOpen(true); setMenuOpen(false) }}
                       className="w-full text-left px-4 py-2.5 text-sm text-[var(--color-text-primary)] hover:bg-[var(--color-bg-secondary)] transition-colors"
                     >
-                      Renombrar
+                      Editar
                     </button>
                     <div className="mx-3 my-1 h-px bg-[var(--color-border)]" />
                     <button
@@ -137,7 +138,7 @@ export default function WorkspaceCard({ workspace, currentUserId, ownerName }: P
       {editOpen && (
         <Modal onClose={() => setEditOpen(false)} size="sm">
           <div className="p-6">
-            <h3 className="text-base font-semibold text-[var(--color-text-primary)] mb-4">Renombrar workspace</h3>
+            <h3 className="text-base font-semibold text-[var(--color-text-primary)] mb-4">Editar workspace</h3>
             <input
               type="text"
               value={name}

@@ -1,12 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 
 interface Props {
   token: string
   workspaceName?: string
+  workspaceSlug?: string
   variant?: 'full' | 'inline'
 }
 
@@ -14,7 +15,7 @@ export default function AcceptInviteButton({ token, workspaceName, variant = 'fu
   const [loading, setLoading] = useState(false)
   const [error, setError]     = useState('')
   const router   = useRouter()
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
 
   async function handleAccept() {
     setLoading(true)
@@ -59,7 +60,7 @@ export default function AcceptInviteButton({ token, workspaceName, variant = 'fu
         <button
           onClick={handleAccept}
           disabled={loading}
-          className="bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
+          className="bg-[var(--color-brand)] text-white px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-[var(--color-brand-hover)] disabled:opacity-50 transition-colors"
         >
           {loading ? '...' : 'Aceptar'}
         </button>
@@ -73,7 +74,7 @@ export default function AcceptInviteButton({ token, workspaceName, variant = 'fu
       <button
         onClick={handleAccept}
         disabled={loading}
-        className="w-full bg-blue-600 text-white py-3 rounded-xl font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors text-sm"
+        className="w-full bg-[var(--color-brand)] text-white py-3 rounded-xl font-medium hover:bg-[var(--color-brand-hover)] disabled:opacity-50 transition-colors text-sm"
       >
         {loading ? 'Uniéndose...' : 'Unirse al workspace'}
       </button>

@@ -33,8 +33,6 @@ export async function proxy(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser()
 
-  console.log('PROXY:', request.nextUrl.pathname, '| user:', user?.id ?? 'NULL', '| cookies:', request.cookies.getAll().map(c => c.name))
-
   const isProtectedRoute =
     request.nextUrl.pathname.startsWith('/dashboard') ||
     request.nextUrl.pathname.startsWith('/workspace') ||
