@@ -39,19 +39,7 @@ export function SidebarClient({ displayName, email, initials, notificationCount 
 
   return (
     <>
-      {/* Mobile toggle (when closed) */}
-      {!isOpen && (
-        <button
-          onClick={() => setIsOpen(true)}
-          className="md:hidden fixed left-0 top-1/2 z-50 bg-[var(--color-surface)] border border-[var(--color-border)] border-l-0 w-7 h-10 rounded-r-full flex items-center justify-center hover:bg-[var(--color-bg-secondary)] transition-all shadow-md"
-          style={{ transform: 'translateY(-50%)' }}
-          title="Abrir menú"
-        >
-          <svg className="w-3.5 h-3.5 text-[var(--color-text-muted)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-          </svg>
-        </button>
-      )}
+
 
       {/* Overlay */}
       {isOpen && (
@@ -169,17 +157,17 @@ export function SidebarClient({ displayName, email, initials, notificationCount 
           </div>
         )}
 
-        {/* Close button mobile */}
-        {isOpen && (
-          <button
-            onClick={() => setIsOpen(false)}
-            className="md:hidden absolute top-4 right-4 z-50 bg-[var(--color-bg-secondary)] w-8 h-8 rounded-lg flex items-center justify-center hover:bg-[var(--color-border)] transition-all"
-          >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        )}
+        {/* Toggle mobile */}
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="md:hidden absolute top-1/2 -right-7 z-50 bg-[var(--color-surface)] border border-[var(--color-border)] border-l-0 w-7 h-10 rounded-r-full flex items-center justify-center hover:bg-[var(--color-bg-secondary)] transition-all duration-300 shadow-md"
+          style={{ transform: 'translateY(-50%)' }}
+          title={isOpen ? 'Cerrar menú' : 'Abrir menú'}
+        >
+          <svg className="w-3.5 h-3.5 text-[var(--color-text-muted)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d={isOpen ? 'M15 19l-7-7 7-7' : 'M9 5l7 7-7 7'} />
+          </svg>
+        </button>
 
         {/* Toggle desktop */}
         <button
