@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { SortableContext, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import type { Column, Card, Label } from '@/types'
@@ -24,7 +24,7 @@ export default function ColumnComponent({ column, cards, labels, onAddCard, onUp
   const [editingName,   setEditingName]   = useState(false)
   const [columnName,    setColumnName]    = useState(column.name)
   const [confirmDelete, setConfirmDelete] = useState(false)
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
 
   const {
     attributes,

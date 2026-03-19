@@ -4,6 +4,7 @@ import CreateBoardButton from '@/components/board/CreateBoardButton'
 import InviteMemberButton from '@/components/workspace/InviteMemberButton'
 import BoardsGrid from '@/components/board/BoardsGrid'
 import MembersPanel from '@/components/workspace/MembersPanel'
+import SentInvitationsList from '@/components/workspace/SentInvitationsList'
 import { WorkspaceNameSetter } from '@/components/workspace/WorkspaceNameSetter'
 import type { Metadata } from 'next'
 
@@ -67,6 +68,22 @@ export default async function WorkspacePage({ params }: { params: Promise<{ id: 
 
   const isOwner = membership.role === 'owner'
 
+  // ─── Invitaciones enviadas pendientes para este workspace ──────────────────────
+  const { data: sentInvitations } = isOwner
+    ? await supabase
+        .from('invitations')
+        .select('id, email, workspace_id, workspaces(name)')
+        .eq('workspace_id', workspace.id)
+        .eq('accepted', false)
+    : { data: [] }
+
+  const sentInvitationItems = (sentInvitations ?? []).map((inv: any) => ({
+    id:            inv.id,
+    email:         inv.email,
+    workspace_id:  inv.workspace_id,
+    workspaceName: inv.workspaces?.name ?? 'Workspace',
+  }))
+
   return (
     <main className="w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-10 bg-[var(--color-bg)]">
       <WorkspaceNameSetter workspaceName={workspace.name} />
@@ -94,6 +111,13 @@ export default async function WorkspacePage({ params }: { params: Promise<{ id: 
         isOwner={isOwner}
         workspaceId={workspace.id}
       />
+
+      {/* Invitaciones enviadas pendientes */}
+      {isOwner && sentInvitationItems.length > 0 && (
+        <div className="mt-8">
+          <SentInvitationsList invitations={sentInvitationItems} />
+        </div>
+      )}
     </main>
   )
 }

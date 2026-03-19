@@ -12,6 +12,7 @@ export default async function DashboardPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
+  // ─── Mis workspaces ────────────────────────────────────────────────────────
   const { data: memberships } = await supabase
     .from('workspace_members')
     .select('workspace_id, role, workspaces(id, name, slug, owner_id)')
@@ -25,6 +26,7 @@ export default async function DashboardPage() {
   const myWorkspaces     = workspaces.filter(ws => ws.owner_id === user.id)
   const sharedWorkspaces = workspaces.filter(ws => ws.owner_id !== user.id)
 
+  // ─── Invitaciones recibidas (pendientes) ───────────────────────────────────
   const { data: pendingInvitations } = await supabase
     .from('invitations')
     .select('id, token, workspace_id, invited_by, workspaces(name)')
@@ -38,6 +40,7 @@ export default async function DashboardPage() {
     if (data) inviterNames[id] = data
   }
 
+  // ─── Owners de workspaces compartidos (para mostrar "De <nombre>") ─────────
   const ownerIds = sharedWorkspaces.map(ws => ws.owner_id)
   const { data: owners } = ownerIds.length > 0
     ? await supabase.from('profiles').select('id, full_name').in('id', ownerIds)
@@ -56,6 +59,7 @@ export default async function DashboardPage() {
 
       <div className="space-y-10 animate-fade-in">
 
+        {/* ── Mis workspaces ─────────────────────────────────────────────── */}
         <section>
           <h3 className="text-sm font-semibold text-[var(--color-text-muted)] uppercase tracking-widest mb-4">
             Mis workspaces
@@ -74,6 +78,7 @@ export default async function DashboardPage() {
           )}
         </section>
 
+        {/* ── Workspaces compartidos con el usuario ──────────────────────── */}
         <section>
           <h3 className="text-sm font-semibold text-[var(--color-text-muted)] uppercase tracking-widest mb-4">
             Workspaces compartidos conmigo

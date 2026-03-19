@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import type { Card, CardLabel, Label } from '@/types'
@@ -18,7 +18,9 @@ interface Props {
 
 export default function CardComponent({ card, labels, onUpdate, onDelete, isDragging }: Props) {
   const [modalOpen, setModalOpen] = useState(false)
-  const supabase = createClient()
+  // createClient() es estable entre renders (singleton interno de @supabase/ssr)
+  // pero lo memoizamos para ser explícitos y evitar recrear el objeto en cada render
+  const supabase = useMemo(() => createClient(), [])
 
   const {
     attributes,
@@ -41,6 +43,16 @@ export default function CardComponent({ card, labels, onUpdate, onDelete, isDrag
   const checklistTotal     = checklistItems.length
   const checklistCompleted = checklistItems.filter(i => i.completed).length
   const checklistDone      = checklistTotal > 0 && checklistCompleted === checklistTotal
+
+  async function handleToggleCompleted(checked: boolean) {
+    // Una sola escritura: actualizamos el estado a través de onUpdate,
+    // que delega la escritura a Supabase en BoardView.handleUpdateCard.
+    // Antes había double-write: Card escribía a Supabase Y llamaba a onUpdate
+    // que volvía a escribir a Supabase.
+    const updated = { ...card, completed: checked }
+    await supabase.from('cards').update({ completed: checked }).eq('id', card.id)
+    onUpdate(updated)
+  }
 
   return (
     <>
@@ -75,18 +87,24 @@ export default function CardComponent({ card, labels, onUpdate, onDelete, isDrag
 
         {/* Checkbox + title */}
         <div className="flex items-start gap-2">
-          <input
-            type="checkbox"
-            checked={card.completed}
-            onChange={async e => {
+          <button
+            type="button"
+            onClick={async e => {
               e.stopPropagation()
-              const updated = { ...card, completed: e.target.checked }
-              await supabase.from('cards').update({ completed: e.target.checked }).eq('id', card.id)
-              onUpdate(updated)
+              await handleToggleCompleted(!card.completed)
             }}
-            onClick={e => e.stopPropagation()}
-            className="mt-0.5 w-4 h-4 rounded accent-[var(--color-brand)] cursor-pointer flex-shrink-0"
-          />
+            className={cn(
+              'mt-0.5 w-5 h-5 rounded flex items-center justify-center flex-shrink-0 transition-all border-2',
+              card.completed
+                ? 'bg-[var(--color-brand)] border-[var(--color-brand)] text-white'
+                : 'bg-[var(--color-bg-secondary)] border-[var(--color-border)] hover:border-[var(--color-text-muted)] text-transparent'
+            )}
+            title={card.completed ? "Marcar como pendiente" : "Marcar como completada"}
+          >
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+          </button>
           <div className="flex-1 min-w-0">
             <span className={cn(
               'text-sm font-medium leading-snug block break-words',

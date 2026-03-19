@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import type { Card, CardLabel, Label, ChecklistItem } from '@/types'
 import { createClient } from '@/lib/supabase/client'
 import { Modal, ConfirmModal } from '@/components/ui/Modal'
@@ -17,6 +17,7 @@ interface Props {
 export default function CardModal({ card, labels, onUpdate, onDelete, onClose }: Props) {
   const [title, setTitle]             = useState(card.title)
   const [description, setDescription] = useState(card.description ?? '')
+  const [isEditingDesc, setIsEditingDesc] = useState(!card.description)
   const [dueDate, setDueDate]         = useState(card.due_date ?? '')
   const [saving, setSaving]           = useState(false)
   const [activeLabels, setActiveLabels] = useState<CardLabel[]>(card.labels ?? [])
@@ -26,7 +27,7 @@ export default function CardModal({ card, labels, onUpdate, onDelete, onClose }:
   )
   const [newItemText, setNewItemText] = useState('')
   const [addingItem, setAddingItem]   = useState(false)
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
 
   const completedCount = checklistItems.filter(i => i.completed).length
   const progress = checklistItems.length > 0
@@ -82,7 +83,7 @@ export default function CardModal({ card, labels, onUpdate, onDelete, onClose }:
     const toDelete = originalLabelIds.filter(id => !activeLabelIds.includes(id))
     const toInsert = activeLabelIds.filter(id => !originalLabelIds.includes(id))
 
-    await Promise.all([
+    const reqs = await Promise.all([
       ...toDelete.map(labelId =>
         supabase.from('card_labels').delete().eq('card_id', card.id).eq('label_id', labelId)
       ),
@@ -90,6 +91,14 @@ export default function CardModal({ card, labels, onUpdate, onDelete, onClose }:
         supabase.from('card_labels').insert({ card_id: card.id, label_id: labelId })
       ),
     ])
+
+    const dbErrors = reqs.map(r => r.error).filter(Boolean)
+    if (dbErrors.length > 0) {
+      alert('Supabase DB Error:\n' + JSON.stringify(dbErrors[0], null, 2))
+      console.error('Labels sync error:', dbErrors)
+      setSaving(false)
+      return
+    }
 
     const updated = {
       ...card,
@@ -123,20 +132,61 @@ export default function CardModal({ card, labels, onUpdate, onDelete, onClose }:
               value={title}
               onChange={e => setTitle(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleSave()}
-              className="w-full text-lg font-bold text-[var(--color-text-primary)] bg-transparent focus:outline-none border-b-2 border-transparent focus:border-blue-400 pb-1 placeholder-[var(--color-text-muted)] transition-colors"
+              className="w-full text-lg font-bold text-[var(--color-text-primary)] bg-transparent focus:outline-none border-b-2 border-transparent focus:border-[var(--color-brand)] pb-1 placeholder-[var(--color-text-muted)] transition-colors"
               placeholder="Título de la tarea"
             />
           </div>
 
           {/* Description */}
-          <Field label="Descripción">
-            <textarea
-              value={description}
-              onChange={e => setDescription(e.target.value)}
-              placeholder="Agregar una descripción..."
-              rows={3}
-              className="w-full text-sm text-[var(--color-text-primary)] bg-[var(--color-bg-secondary)] placeholder-[var(--color-text-muted)] border border-[var(--color-border)] rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none transition-colors"
-            />
+          <Field 
+            label="Descripción"
+            action={
+              card.description && !isEditingDesc && (
+                <button
+                  onClick={() => setIsEditingDesc(true)}
+                  className="text-xs bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)] hover:bg-[var(--color-border)] px-3 py-1.5 rounded-lg transition-colors font-medium inline-block ml-auto"
+                >
+                  Editar
+                </button>
+              )
+            }
+          >
+            {isEditingDesc ? (
+              <div className="space-y-2 animate-scale-in origin-top">
+                <textarea
+                  value={description}
+                  onChange={e => setDescription(e.target.value)}
+                  placeholder="Agregar una descripción más detallada..."
+                  rows={4}
+                  className="w-full text-sm text-[var(--color-text-primary)] bg-[var(--color-surface)] placeholder-[var(--color-text-muted)] border border-[var(--color-border)] rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-[var(--color-brand)] resize-none transition-colors"
+                  autoFocus={!!card.description}
+                />
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setIsEditingDesc(false)}
+                    className="bg-[var(--color-brand)] text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-[var(--color-brand-hover)] transition-colors"
+                  >
+                    Cerrar
+                  </button>
+                  <button
+                    onClick={() => {
+                      setDescription(card.description ?? '')
+                      setIsEditingDesc(false)
+                    }}
+                    className="text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] px-2 transition-colors"
+                  >
+                    Descartar
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div 
+                onClick={() => setIsEditingDesc(true)}
+                className="text-sm text-[var(--color-text-primary)] hover:bg-[var(--color-bg-secondary)] cursor-pointer rounded-xl p-3 min-h-[60px] whitespace-pre-wrap transition-colors break-words"
+              >
+                {description || <span className="text-[var(--color-text-muted)]">Agregar una descripción más detallada...</span>}
+              </div>
+            )}
           </Field>
 
           {/* Due date */}
@@ -145,7 +195,7 @@ export default function CardModal({ card, labels, onUpdate, onDelete, onClose }:
               type="date"
               value={dueDate}
               onChange={e => setDueDate(e.target.value)}
-              className="text-sm text-[var(--color-text-primary)] bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+              className="text-sm text-[var(--color-text-primary)] bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--color-brand)] transition-colors"
             />
             {dueDate && (
               <button
@@ -189,7 +239,7 @@ export default function CardModal({ card, labels, onUpdate, onDelete, onClose }:
               !addingItem && (
                 <button
                   onClick={() => setAddingItem(true)}
-                  className="text-xs text-blue-600 hover:text-blue-800 font-medium transition-colors"
+                  className="text-xs text-[var(--color-brand)] hover:text-[var(--color-brand-hover)] font-medium transition-colors"
                 >
                   + Agregar ítem
                 </button>
@@ -203,7 +253,7 @@ export default function CardModal({ card, labels, onUpdate, onDelete, onClose }:
                 <div className="flex-1 bg-[var(--color-bg-secondary)] rounded-full h-2">
                   <div
                     className="h-2 rounded-full transition-all duration-300"
-                    style={{ width: `${progress}%`, backgroundColor: progress === 100 ? '#22c55e' : '#3b82f6' }}
+                    style={{ width: `${progress}%`, backgroundColor: progress === 100 ? '#22c55e' : 'var(--color-brand)' }}
                   />
                 </div>
               </div>
@@ -213,18 +263,26 @@ export default function CardModal({ card, labels, onUpdate, onDelete, onClose }:
             <div className="space-y-1">
               {checklistItems.map(item => (
                 <div key={item.id} className="flex items-center gap-3 group py-1 px-1 rounded-lg hover:bg-[var(--color-bg-secondary)] transition-colors">
-                  <input
-                    type="checkbox"
-                    checked={item.completed}
-                    onChange={() => handleToggleItem(item)}
-                    className="w-4 h-4 rounded accent-blue-600 cursor-pointer flex-shrink-0"
-                  />
+                  <button
+                    type="button"
+                    onClick={() => handleToggleItem(item)}
+                    className={cn(
+                      'w-5 h-5 rounded flex items-center justify-center flex-shrink-0 transition-all border-2',
+                      item.completed
+                        ? 'bg-[var(--color-brand)] border-[var(--color-brand)] text-white'
+                        : 'bg-[var(--color-bg-secondary)] border-[var(--color-border)] hover:border-[var(--color-text-muted)] text-transparent'
+                    )}
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                  </button>
                   <span className={cn('text-sm flex-1', item.completed ? 'line-through text-[var(--color-text-muted)]' : 'text-[var(--color-text-primary)]')}>
                     {item.text}
                   </span>
                   <button
                     onClick={() => handleDeleteItem(item.id)}
-                    className="w-6 h-6 flex items-center justify-center rounded text-[var(--color-text-muted)] hover:text-red-400 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-all flex-shrink-0"
+                    className="w-6 h-6 flex items-center justify-center rounded text-[var(--color-text-muted)] hover:text-red-400 hover:bg-red-500/10 opacity-0 group-hover:opacity-100 transition-all flex-shrink-0"
                   >
                     <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -247,13 +305,13 @@ export default function CardModal({ card, labels, onUpdate, onDelete, onClose }:
                     if (e.key === 'Escape') { setAddingItem(false); setNewItemText('') }
                   }}
                   autoFocus
-                  className="w-full text-sm text-[var(--color-text-primary)] bg-[var(--color-surface)] placeholder-[var(--color-text-muted)] border border-[var(--color-border)] rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2"
+                  className="w-full text-sm text-[var(--color-text-primary)] bg-[var(--color-surface)] placeholder-[var(--color-text-muted)] border border-[var(--color-border)] rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--color-brand)] mb-2"
                 />
                 <div className="flex gap-2">
                   <button
                     onClick={handleAddItem}
                     disabled={!newItemText.trim()}
-                    className="bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                    className="bg-[var(--color-brand)] text-white px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-[var(--color-brand-hover)] disabled:opacity-50 transition-colors"
                   >
                     Agregar
                   </button>
@@ -290,7 +348,7 @@ export default function CardModal({ card, labels, onUpdate, onDelete, onClose }:
             <button
               onClick={handleSave}
               disabled={saving || !title.trim()}
-              className="bg-blue-600 text-white px-5 py-2 rounded-xl text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
+              className="bg-[var(--color-brand)] text-white px-5 py-2 rounded-xl text-sm font-medium hover:bg-[var(--color-brand-hover)] disabled:opacity-50 transition-colors"
             >
               {saving ? 'Guardando...' : 'Guardar'}
             </button>

@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Modal } from '@/components/ui/Modal'
+import { useRouter } from 'next/navigation'
 
 interface FoundUser {
   id: string
@@ -22,6 +23,7 @@ export default function InviteMemberButton({ workspaceId, workspaceName }: { wor
   const [notFound, setNotFound]     = useState(false)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const supabase = createClient()
+  const router = useRouter()
 
   // Buscar usuario cuando el email cambia
   useEffect(() => {
@@ -73,6 +75,7 @@ export default function InviteMemberButton({ workspaceId, workspaceName }: { wor
 
     setSuccess(true)
     setLoading(false)
+    router.refresh()
   }
 
   function handleClose() {
@@ -117,7 +120,7 @@ export default function InviteMemberButton({ workspaceId, workspaceName }: { wor
                 </p>
                 <button
                   onClick={handleClose}
-                  className="mt-5 bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-blue-700 transition-colors"
+                  className="mt-5 bg-[var(--color-brand)] text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-[var(--color-brand-hover)] transition-colors"
                 >
                   Cerrar
                 </button>
@@ -185,7 +188,7 @@ export default function InviteMemberButton({ workspaceId, workspaceName }: { wor
                   <button
                     onClick={handleInvite}
                     disabled={loading || !email.trim() || !email.includes('@')}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                    className="bg-[var(--color-brand)] text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-[var(--color-brand-hover)] disabled:opacity-50 transition-colors"
                   >
                     {loading ? 'Invitando...' : 'Invitar'}
                   </button>

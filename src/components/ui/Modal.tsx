@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { cn } from '@/lib/utils'
 
@@ -19,26 +19,30 @@ const sizeClasses = {
 
 export function Modal({ children, onClose, className, size = 'md' }: ModalProps) {
   const [mounted, setMounted] = useState(false)
+  // Estabilizamos onClose en un ref para que el event listener del teclado
+  // no se desuscriba/re-suscriba en cada render cuando el padre pasa una lambda anónima.
+  const onCloseRef = useRef(onClose)
+  useEffect(() => { onCloseRef.current = onClose }, [onClose])
 
   useEffect(() => {
     setMounted(true)
     function handleKey(e: KeyboardEvent) {
-      if (e.key === 'Escape') onClose()
+      if (e.key === 'Escape') onCloseRef.current()
     }
     document.addEventListener('keydown', handleKey)
     document.body.style.overflow = 'hidden'
-    return () => { 
+    return () => {
       document.removeEventListener('keydown', handleKey)
-      document.body.style.overflow = '' 
+      document.body.style.overflow = ''
     }
-  }, [onClose])
+  }, []) // dep array vacío: se registra una sola vez
 
   if (!mounted) return null
 
   return createPortal(
     <div
       className="fixed inset-0 bg-black/50 backdrop-blur-[2px] flex items-start justify-center z-50 p-4 overflow-y-auto"
-      onClick={e => e.target === e.currentTarget && onClose()}
+      onClick={e => e.target === e.currentTarget && onCloseRef.current()}
       role="dialog"
       aria-modal="true"
     >

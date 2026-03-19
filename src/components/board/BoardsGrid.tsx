@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useMemo } from 'react'
 import {
   DndContext,
   DragOverlay,
@@ -71,10 +71,10 @@ export default function BoardsGrid({ initialBoards, workspaceId, isOwner }: Prop
   const boardsRef = useRef(boards)
   useEffect(() => { boardsRef.current = boards }, [boards])
   useEffect(() => {
-  setBoards([...initialBoards].sort((a, b) => a.position - b.position))
-    }, [initialBoards])
+    setBoards([...initialBoards].sort((a, b) => a.position - b.position))
+  }, [initialBoards])
 
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import {
   DndContext,
   DragOverlay,
@@ -39,7 +39,7 @@ export default function BoardView({ board, initialColumns, initialCards, initial
   const [addingColumn, setAddingColumn] = useState(false)
   const [newColumnName, setNewColumnName] = useState('')
   const [savingColumn, setSavingColumn] = useState(false)
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
 
   const cardsRef            = useRef(cards)
   const columnsRef          = useRef(columns)
@@ -49,6 +49,20 @@ export default function BoardView({ board, initialColumns, initialCards, initial
   useEffect(() => { cardsRef.current   = cards   }, [cards])
   useEffect(() => { columnsRef.current = columns }, [columns])
   useEffect(() => { setLabels(initialLabels) }, [initialLabels])
+
+  // Pre-agrupar y ordenar cards por column_id una sola vez cuando cambia `cards`,
+  // en lugar de hacer .filter().sort() inline por cada columna en cada render.
+  const cardsByColumn = useMemo<Record<string, typeof cards>>(() => {
+    const map: Record<string, typeof cards> = {}
+    for (const card of cards) {
+      if (!map[card.column_id]) map[card.column_id] = []
+      map[card.column_id].push(card)
+    }
+    for (const id in map) {
+      map[id].sort((a, b) => a.position - b.position)
+    }
+    return map
+  }, [cards])
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -261,7 +275,7 @@ export default function BoardView({ board, initialColumns, initialCards, initial
                   <ColumnComponent
                     key={column.id}
                     column={column}
-                    cards={cards.filter(c => c.column_id === column.id).sort((a, b) => a.position - b.position)}
+                    cards={cardsByColumn[column.id] ?? []}
                     labels={labels}
                     onAddCard={handleAddCard}
                     onUpdateCard={handleUpdateCard}

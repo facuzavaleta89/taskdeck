@@ -51,7 +51,7 @@ export default async function BoardPage({ params }: { params: Promise<{ id: stri
 
   const { data: cards } = await supabase
     .from('cards')
-    .select('*, card_labels(label_id, labels(*)), checklist_items(*)')
+    .select('*, labels:card_labels(label_id, labels(*)), checklist_items(*)')
     .in('column_id', columns?.map(c => c.id) ?? [])
     .order('position')
 
