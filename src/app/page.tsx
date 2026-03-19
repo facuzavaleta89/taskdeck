@@ -16,8 +16,8 @@ export default async function LandingPage() {
         <div className="max-w-2xl text-center animate-fade-in">
 
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-[var(--color-text-primary)] leading-tight tracking-tight mb-5">
-            Organizá tu equipo,<br />
-            <span className="text-[var(--color-brand)]">sin el caos.</span>
+            Menos reuniones.<br />
+            <span className="text-[var(--color-brand)]">Más avances.</span>
           </h1>
 
           <p className="text-[var(--color-text-secondary)] text-base sm:text-lg leading-relaxed mb-10 max-w-lg mx-auto">
