@@ -67,7 +67,7 @@ export default function ColumnComponent({ column, cards, labels, onAddCard, onUp
         className={`
           flex-shrink-0 w-72 flex flex-col rounded-2xl
           bg-[var(--color-bg-secondary)] border border-[var(--color-border)]
-          shadow-sm transition-all duration-150
+          shadow-sm transition-all duration-150 max-h-full
           ${isOver ? 'ring-2 ring-[var(--color-brand)]/50 scale-[1.01]' : ''}
           ${isColumnDragging ? 'opacity-40' : ''}
         `}
@@ -125,7 +125,7 @@ export default function ColumnComponent({ column, cards, labels, onAddCard, onUp
         </div>
 
         {/* Cards area */}
-        <div className="flex-1 overflow-y-auto px-2 pb-2 space-y-2 min-h-[40px]">
+        <div className="flex-1 column-scroll px-2 pb-2 space-y-2 min-h-[40px]">
           <SortableContext items={cards.map(c => c.id)} strategy={verticalListSortingStrategy}>
             {cards.map(card => (
               <CardComponent

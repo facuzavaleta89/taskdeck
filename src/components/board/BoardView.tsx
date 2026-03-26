@@ -261,7 +261,7 @@ export default function BoardView({ board, initialColumns, initialCards, initial
       </div>
 
       <div className="flex-1 overflow-hidden w-full">
-        <div className="board-scroll p-4 sm:p-6 h-full w-full">
+        <div className="board-scroll h-full w-full">
           <DndContext
             sensors={sensors}
             collisionDetection={collisionDetection}
@@ -270,7 +270,7 @@ export default function BoardView({ board, initialColumns, initialCards, initial
             onDragEnd={handleDragEnd}
           >
             <SortableContext items={columns.map(c => c.id)} strategy={horizontalListSortingStrategy}>
-              <div className="flex gap-3 items-start h-full" style={{ minWidth: 'max-content' }}>
+              <div className="flex gap-3 items-start h-full p-4 sm:p-6" style={{ minWidth: 'max-content' }}>
                 {columns.map(column => (
                   <ColumnComponent
                     key={column.id}
