@@ -153,7 +153,7 @@ export default function ColumnComponent({ column, cards, labels, onAddCard, onUp
                 }}
                 autoFocus
                 rows={2}
-                className="w-full text-sm text-[var(--color-text-primary)] bg-[var(--color-surface)] placeholder-[var(--color-text-muted)] resize-none focus:outline-none"
+                className="w-full px-3 py-2 rounded-lg text-sm text-[var(--color-text-primary)] bg-[var(--color-surface)] placeholder-[var(--color-text-muted)] resize-none border border-[var(--color-border)] focus:outline-none focus:ring-2 focus:ring-[var(--color-brand)] transition-all"
               />
               <div className="flex gap-2 mt-2">
                 <button
