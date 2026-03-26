@@ -252,7 +252,7 @@ export default function BoardView({ board, initialColumns, initialCards, initial
 
   return (
     <div className="flex flex-col flex-1 overflow-hidden w-full">
-      <div className="px-4 sm:px-6 py-2 flex items-center gap-2 flex-shrink-0 border-b border-[var(--color-border)]">
+      <div className="px-4 sm:px-6 py-2 flex items-center gap-2 flex-shrink-0 border-b border-[var(--color-border)]" style={{ backgroundImage: 'linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.25))' }}>
         <LabelsManager
           boardId={board.id}
           initialLabels={labels}
@@ -260,7 +260,7 @@ export default function BoardView({ board, initialColumns, initialCards, initial
         />
       </div>
 
-      <div className="flex-1 overflow-hidden w-full" style={{ backgroundImage: 'linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8))' }}>
+      <div className="flex-1 overflow-hidden w-full" style={{ backgroundImage: 'linear-gradient(rgba(0,0,0,0.75), rgba(0,0,0,0.75))' }}>
         <div className="board-scroll h-full w-full">
           <DndContext
             sensors={sensors}
